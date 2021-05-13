@@ -1,6 +1,6 @@
 "use strict";
 
-const COMMENTS_LIST = [
+const COMMENTS = [
   "Всё отлично!",
   "В целом всё неплохо. Но не всё.",
   "Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.",
@@ -9,7 +9,7 @@ const COMMENTS_LIST = [
   "Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!",
 ];
 
-const NAMES_LIST = ["Артем", "Кирилл", "Даник", "Владик", "Валера", "Настя"];
+const NAMES = ["Артем", "Кирилл", "Даник", "Владик", "Валера", "Настя"];
 
 const MIN_LIKES_COUNT = 15;
 const MAX_LIKES_COUNT = 200;
@@ -19,33 +19,33 @@ const PHOTOS_COUNT = 25;
 const MIN_COMMENTS_COUNT = 0;
 const MAX_COMMENTS_COUNT = 10;
 
-const postList = [];
+const postedPhotos = [];
 
-const randomInteger = (min, max) =>
+const getRandomInteger = (min, max) =>
   Math.floor(min + Math.random() * (max + 1 - min));
 
-const randomUnitFromList = (list) => list[randomInteger(0, list.length - 1)];
+const getRandomUnitFromList = (list) => list[getRandomInteger(0, list.length - 1)];
 
 const generateComments = () => {
   const comments = [];
-  const maxCommentsAmount = randomInteger(MIN_COMMENTS_COUNT, MAX_COMMENTS_COUNT);
+  const maxCommentsAmount = getRandomInteger(MIN_COMMENTS_COUNT, MAX_COMMENTS_COUNT);
 
   for (let i = 0; i < maxCommentsAmount; i++) {
     comments.push({
-      avatar: `img/avatar-${randomInteger(MIN_AVATAR_COUNT, MAX_AVATAR_COUNT)}.svg`,
-      message: randomUnitFromList(COMMENTS_LIST),
-      name: randomUnitFromList(NAMES_LIST),
+      avatar: `img/avatar-${getRandomInteger(MIN_AVATAR_COUNT, MAX_AVATAR_COUNT)}.svg`,
+      message: getRandomUnitFromList(COMMENTS),
+      name: getRandomUnitFromList(NAMES),
     });
   }
 
   return comments;
 };
 
-const generatePostList = () => {
+const generatePostedPhotos = () => {
   for (let i = 0; i < PHOTOS_COUNT; i++) {
-    postList.push({
+    postedPhotos.push({
       url: `photos/${i + 1}.jpg`,
-      likes: randomInteger(MIN_LIKES_COUNT, MAX_LIKES_COUNT),
+      likes: getRandomInteger(MIN_LIKES_COUNT, MAX_LIKES_COUNT),
       comments: generateComments(),
     });
   }
@@ -65,7 +65,7 @@ const removeElementsFromList = (list) => {
   }
 };
 
-generatePostList();
+generatePostedPhotos();
 
 const pictureList = document.querySelector(".pictures");
 const pictureCard = document.querySelector("#picture");
@@ -73,10 +73,10 @@ const pictureImage = picture.content.querySelector(".picture__img");
 const pictureLikes = picture.content.querySelector(".picture__likes");
 const pictureCommentsCount = picture.content.querySelector(".picture__comments");
 
-for (let i = 0; i < postList.length; i++) {
-  pictureImage.src = postList[i].url;
-  pictureLikes.textContent = postList[i].likes;
-  pictureCommentsCount.textContent = postList[i].comments.length;
+for (let i = 0; i < postedPhotos.length; i++) {
+  pictureImage.src = postedPhotos[i].url;
+  pictureLikes.textContent = postedPhotos[i].likes;
+  pictureCommentsCount.textContent = postedPhotos[i].comments.length;
   let picture = pictureCard.content.cloneNode(true);
   pictureList.append(picture);
 }
@@ -89,9 +89,9 @@ const bigPictureCommentsCount = bigPictureCard.querySelector(".comments-count");
 
 bigPictureCard.classList.remove("hidden");
 
-bigPictureImage.src = postList[0].url;
-bigPictureLikes.textContent = postList[0].likes;
-bigPictureCommentsCount.textContent = postList[0].comments.length;
+bigPictureImage.src = postedPhotos[0].url;
+bigPictureLikes.textContent = postedPhotos[0].likes;
+bigPictureCommentsCount.textContent = postedPhotos[0].comments.length;
 
 //comments
 
@@ -107,9 +107,9 @@ const socialCommentsLoaderButton =
 
 removeElementsFromList(socialCommentList);
 
-for (let i = 0; i < postList[0].comments.length; i++) {
-  socialCommentPicture.src = postList[0].comments[i].avatar;
-  socialCommentText.textContent = postList[0].comments[i].message;
+for (let i = 0; i < postedPhotos[0].comments.length; i++) {
+  socialCommentPicture.src = postedPhotos[0].comments[i].avatar;
+  socialCommentText.textContent = postedPhotos[0].comments[i].message;
   let comment = socialComment.cloneNode(true);
   socialCommentList.append(comment);
 }
