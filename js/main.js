@@ -68,16 +68,16 @@ const removeElementsFromList = (list) => {
 generatePostedPhotos();
 
 const pictureList = document.querySelector(".pictures");
-const pictureCard = document.querySelector("#picture");
-const pictureImage = picture.content.querySelector(".picture__img");
-const pictureLikes = picture.content.querySelector(".picture__likes");
-const pictureCommentsCount = picture.content.querySelector(".picture__comments");
+const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
+const pictureImage = pictureTemplate.querySelector(".picture__img");
+const pictureLikes = pictureTemplate.querySelector(".picture__likes");
+const pictureCommentsCount = pictureTemplate.querySelector(".picture__comments");
 
 for (let i = 0; i < postedPhotos.length; i++) {
   pictureImage.src = postedPhotos[i].url;
   pictureLikes.textContent = postedPhotos[i].likes;
   pictureCommentsCount.textContent = postedPhotos[i].comments.length;
-  let picture = pictureCard.content.cloneNode(true);
+  const picture = pictureTemplate.cloneNode(true);
   pictureList.append(picture);
 }
 
