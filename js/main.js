@@ -11,34 +11,53 @@ const COMMENTS_LIST = [
 
 const NAMES_LIST = ["Артем", "Кирилл", "Даник", "Владик", "Валера", "Настя"];
 
+const MIN_LIKES_COUNT = 15;
+const MAX_LIKES_COUNT = 200;
+const MIN_AVATAR_COUNT = 1;
+const MAX_AVATAR_COUNT = 6;
+const PHOTOS_COUNT = 25;
+const MIN_COMMENTS_COUNT = 0;
+const MAX_COMMENTS_COUNT = 10;
+
+const postList = [];
+
 const randomInteger = (min, max) =>
   Math.floor(min + Math.random() * (max + 1 - min));
 
 const randomUnitFromList = (list) => list[randomInteger(0, list.length - 1)];
 
-const createList = (count, generateFunction) => {
-  const list = [];
-  for (let i = 0; i < count; i++) {
-    list.push(generateFunction());
+const generateComments = () => {
+  const comments = [];
+  const maxCommentsAmount = randomInteger(MIN_COMMENTS_COUNT, MAX_COMMENTS_COUNT);
+
+  for (let i = 0; i < maxCommentsAmount; i++) {
+    comments.push({
+      avatar: `img/avatar-${randomInteger(MIN_AVATAR_COUNT, MAX_AVATAR_COUNT)}.svg`,
+      message: randomUnitFromList(COMMENTS_LIST),
+      name: randomUnitFromList(NAMES_LIST),
+    });
   }
-  return list;
+
+  return comments;
 };
 
-const createComment = () => {
-  return {
-    avatar: `img/avatar-${randomInteger(1, 6)}.svg`,
-    message: randomUnitFromList(COMMENTS_LIST),
-    name: randomUnitFromList(NAMES_LIST),
-  };
+const generatePostList = () => {
+  for (let i = 0; i < PHOTOS_COUNT; i++) {
+    postList.push({
+      url: `photos/${i + 1}.jpg`,
+      likes: randomInteger(MIN_LIKES_COUNT, MAX_LIKES_COUNT),
+      comments: generateComments(),
+    });
+  }
 };
 
-const createPost = () => {
-  return {
-    url: `photos/${randomInteger(1, 25)}.jpg`,
-    likes: randomInteger(15, 200),
-    comments: createList(randomInteger(1, 7), createComment),
-  };
-};
+// const createList = (count, generateFunction) => {
+//   const list = [];
+//   for (let i = 0; i < count; i++) {
+//     list.push(generateFunction());
+//   }
+//   return list;
+// };
 
 const removeElementsFromList = (list) => {
   while (list.firstChild) {
@@ -46,7 +65,7 @@ const removeElementsFromList = (list) => {
   }
 };
 
-const postList = createList(25, createPost);
+generatePostList();
 
 const pictureList = document.querySelector(".pictures");
 const pictureCard = document.querySelector("#picture");
@@ -78,10 +97,13 @@ bigPictureCommentsCount.textContent = postList[0].comments.length;
 
 const socialCommentList = bigPictureCard.querySelector(".social__comments");
 const socialComment = socialCommentList.querySelector(".social__comment");
-const socialCommentsCount = bigPictureCard.querySelector(".social__comment-count");
+const socialCommentsCount = bigPictureCard.querySelector(
+  ".social__comment-count"
+);
 const socialCommentPicture = socialComment.querySelector(".social__picture");
 const socialCommentText = socialComment.querySelector(".social__text");
-const socialCommentsLoaderButton = bigPictureCard.querySelector(".comments-loader");
+const socialCommentsLoaderButton =
+  bigPictureCard.querySelector(".comments-loader");
 
 removeElementsFromList(socialCommentList);
 
