@@ -24,7 +24,8 @@ const postedPhotos = [];
 const getRandomInteger = (min, max) =>
   Math.floor(min + Math.random() * (max + 1 - min));
 
-const getRandomUnitFromList = (list) => list[getRandomInteger(0, list.length - 1)];
+const getRandomUnitFromList = (list) =>
+  list[getRandomInteger(0, list.length - 1)];
 
 const generateComments = () => {
   const comments = [];
@@ -32,7 +33,10 @@ const generateComments = () => {
 
   for (let i = 0; i < maxCommentsAmount; i++) {
     comments.push({
-      avatar: `img/avatar-${getRandomInteger(MIN_AVATAR_COUNT, MAX_AVATAR_COUNT)}.svg`,
+      avatar: `img/avatar-${getRandomInteger(
+        MIN_AVATAR_COUNT,
+        MAX_AVATAR_COUNT
+      )}.svg`,
       message: getRandomUnitFromList(COMMENTS),
       name: getRandomUnitFromList(NAMES),
     });
@@ -68,7 +72,9 @@ const removeElementsFromList = (list) => {
 generatePostedPhotos();
 
 const pictureList = document.querySelector(".pictures");
-const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
+const pictureTemplate = document
+  .querySelector("#picture")
+  .content.querySelector(".picture");
 const pictureImage = pictureTemplate.querySelector(".picture__img");
 const pictureLikes = pictureTemplate.querySelector(".picture__likes");
 const pictureCommentsCount = pictureTemplate.querySelector(".picture__comments");
@@ -97,13 +103,10 @@ bigPictureCommentsCount.textContent = postedPhotos[0].comments.length;
 
 const socialCommentList = bigPictureCard.querySelector(".social__comments");
 const socialComment = socialCommentList.querySelector(".social__comment");
-const socialCommentsCount = bigPictureCard.querySelector(
-  ".social__comment-count"
-);
+const socialCommentsCount = bigPictureCard.querySelector(  ".social__comment-count");
 const socialCommentPicture = socialComment.querySelector(".social__picture");
 const socialCommentText = socialComment.querySelector(".social__text");
-const socialCommentsLoaderButton =
-  bigPictureCard.querySelector(".comments-loader");
+const socialCommentsLoaderButton = bigPictureCard.querySelector(".comments-loader");
 
 removeElementsFromList(socialCommentList);
 
