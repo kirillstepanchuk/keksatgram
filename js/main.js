@@ -97,16 +97,13 @@ generatePostedPhotos();
 
 const pictures = document.querySelector(".pictures");
 const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
-const pictureImage = pictureTemplate.querySelector(".picture__img");
-const pictureLikes = pictureTemplate.querySelector(".picture__likes");
-const pictureCommentsCount = pictureTemplate.querySelector(".picture__comments");
 const pictureFragment = document.createDocumentFragment();
 
 for (let i = 0; i < postedPhotos.length; i++) {
-  pictureImage.src = postedPhotos[i].url;
-  pictureLikes.textContent = postedPhotos[i].likes;
-  pictureCommentsCount.textContent = postedPhotos[i].comments.length;
   const picture = pictureTemplate.cloneNode(true);
+  picture.querySelector(".picture__img").src = postedPhotos[i].url;
+  picture.querySelector(".picture__likes").textContent = postedPhotos[i].likes;
+  picture.querySelector(".picture__comments").textContent = postedPhotos[i].comments.length;
   pictureFragment.append(picture);
 }
 
