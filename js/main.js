@@ -11,6 +11,15 @@ const COMMENTS = [
 
 const NAMES = ["Артем", "Кирилл", "Даник", "Владик", "Валера", "Настя"];
 
+const DESCRIPTIONS = [
+  "Тестим новую камеру!",
+  "Затусили с друзьями на море",
+  "Как же круто тут кормят",
+  "Отдыхаем...",
+  "Цените каждое мгновенье. Цените тех, кто рядом с вами и отгоняйте все сомненья. Не обижайте всех словами......",
+  "Вот это тачка!",
+]
+
 const MIN_LIKES_COUNT = 15;
 const MAX_LIKES_COUNT = 200;
 const MIN_AVATAR_COUNT = 1;
@@ -49,6 +58,7 @@ const generatePostedPhotos = () => {
       url: `photos/${i + 1}.jpg`,
       likes: getRandomInteger(MIN_LIKES_COUNT, MAX_LIKES_COUNT),
       comments: generateCommentsList(),
+      description: getRandomUnitFromList(DESCRIPTIONS),
     });
   }
 };
@@ -64,7 +74,7 @@ const createCommentImage = (elementNumber) => {
   commentImage.height = AVATAR_HEIGHT;
 
   return commentImage;
-}
+};
 
 const createCommentText = (elementNumber) => {
   const commentText = document.createElement("p");
@@ -74,7 +84,7 @@ const createCommentText = (elementNumber) => {
   commentText.textContent = postedPhotos[0].comments[elementNumber].message;
 
   return commentText;
-}
+};
 
 const createComment = (elementNumber) => {
   const commentElement = document.createElement("li");
@@ -85,13 +95,21 @@ const createComment = (elementNumber) => {
   commentElement.append(createCommentText(elementNumber));
 
   return commentElement;
-}
+};
 
 const removeElementsFromList = (list) => {
   while (list.firstChild) {
     list.removeChild(list.firstChild);
   }
 };
+
+// const showUploadForm = () => {
+//   document.querySelector(".img-upload__overlay").classList.remove("hidden");
+// }
+
+// const closeUploadForm = () => {
+//   document.querySelector(".img-upload__overlay").classList.add("hidden");
+// }
 
 generatePostedPhotos();
 
@@ -105,40 +123,54 @@ for (let i = 0; i < postedPhotos.length; i++) {
   picture.querySelector(".picture__likes").textContent = postedPhotos[i].likes;
   picture.querySelector(".picture__comments").textContent = postedPhotos[i].comments.length;
   pictureFragment.append(picture);
-}
+};
 
 pictures.append(pictureFragment);
 
 //big picture
-const bigPictureCard = document.querySelector(".big-picture");
-const bigPictureImage = bigPictureCard.querySelector(".big-picture__img img");
-const bigPictureLikes = bigPictureCard.querySelector(".likes-count");
-const bigPictureCommentsCount = bigPictureCard.querySelector(".comments-count");
+const showBigPicture = () =>{
+  const bigPictureCard = document.querySelector(".big-picture");
+  const bigPictureImage = bigPictureCard.querySelector(".big-picture__img img");
+  const bigPictureLikes = bigPictureCard.querySelector(".likes-count");
+  const bigPictureCommentsCount = bigPictureCard.querySelector(".comments-count");
+  const bigPictureDescription = bigPictureCard.querySelector(".social__caption");
 
-bigPictureCard.classList.remove("hidden");
+  bigPictureCard.classList.remove("hidden");
 
-bigPictureImage.src = postedPhotos[0].url;
-bigPictureLikes.textContent = postedPhotos[0].likes;
-bigPictureCommentsCount.textContent = postedPhotos[0].comments.length;
+  bigPictureImage.src = postedPhotos[0].url;
+  bigPictureLikes.textContent = postedPhotos[0].likes;
+  bigPictureCommentsCount.textContent = postedPhotos[0].comments.length;
+  bigPictureDescription.textContent = postedPhotos[0].description;
 
-//comments
+  //comments
 
-const socialCommens = bigPictureCard.querySelector(".social__comments");
-const socialComment = socialCommens.querySelector(".social__comment");
-const commentFragment = document.createDocumentFragment();
+  const socialCommens = bigPictureCard.querySelector(".social__comments");
+  const socialComment = socialCommens.querySelector(".social__comment");
+  const commentFragment = document.createDocumentFragment();
 
-removeElementsFromList(socialCommens);
+  removeElementsFromList(socialCommens);
 
-for (let i = 0; i < postedPhotos[0].comments.length; i++) {
-  const commentElement = createComment(i);
+  for (let i = 0; i < postedPhotos[0].comments.length; i++) {
+    const commentElement = createComment(i);
 
-  commentFragment.append(commentElement);
-}
+    commentFragment.append(commentElement);
+  };
 
-socialCommens.append(commentFragment);
+  socialCommens.append(commentFragment);
 
-const socialCommentsCount = bigPictureCard.querySelector(".social__comment-count");
-const socialCommentsLoaderButton = bigPictureCard.querySelector(".comments-loader");
+  const socialCommentsCount = bigPictureCard.querySelector(".social__comment-count");
+  const socialCommentsLoaderButton = bigPictureCard.querySelector(".comments-loader");
 
-socialCommentsCount.classList.add("visually-hidden");
-socialCommentsLoaderButton.classList.add("visually-hidden");
+  socialCommentsCount.classList.add("visually-hidden");
+  socialCommentsLoaderButton.classList.add("visually-hidden");
+};
+
+showBigPicture();
+//events
+// const uploadInput = document.querySelector("#upload-file");
+// const uploadCancelButton = document.querySelector("#upload-cancel");
+
+// uploadInput.addEventListener("change", showUploadForm);
+
+// uploadCancelButton.addEventListener("click", closeUploadForm);
+
