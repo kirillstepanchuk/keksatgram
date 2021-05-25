@@ -33,6 +33,8 @@ const AVATAR_ALTERNATIVE_TEXT = "Аватар автора комментари�
 
 const postedPhotos = [];
 
+//functions
+
 const getRandomInteger = (min, max) => Math.floor(min + Math.random() * (max + 1 - min));
 
 const getRandomUnitFromList = (list) => list[getRandomInteger(0, list.length - 1)];
@@ -103,13 +105,22 @@ const removeElementsFromList = (list) => {
   }
 };
 
-// const showUploadForm = () => {
-//   document.querySelector(".img-upload__overlay").classList.remove("hidden");
-// }
+const onUploadFormEscPress = (evt) => {
+  if (evt.keyCode === 27) {
+      uploadForm.classList.add("hidden")
+  }
+}
 
-// const closeUploadForm = () => {
-//   document.querySelector(".img-upload__overlay").classList.add("hidden");
-// }
+const showUploadForm = () => {
+  uploadForm.classList.remove("hidden");
+  document.addEventListener("keydown", onUploadFormEscPress);
+}
+
+const closeUploadForm = () => {
+  uploadForm.classList.add("hidden");
+  document.removeEventListener("keydown", onUploadFormEscPress);
+  uploadInput.value = "";
+}
 
 generatePostedPhotos();
 
@@ -165,12 +176,21 @@ const showBigPicture = () =>{
   socialCommentsLoaderButton.classList.add("visually-hidden");
 };
 
-showBigPicture();
 //events
-// const uploadInput = document.querySelector("#upload-file");
-// const uploadCancelButton = document.querySelector("#upload-cancel");
+const uploadInput = document.querySelector("#upload-file");
+const uploadCancelButton = document.querySelector("#upload-cancel");
+const uploadForm = document.querySelector(".img-upload__overlay");
 
-// uploadInput.addEventListener("change", showUploadForm);
+uploadInput.addEventListener("change", () => {
+  showUploadForm();
+});
 
-// uploadCancelButton.addEventListener("click", closeUploadForm);
+uploadCancelButton.addEventListener("click", () => {
+  closeUploadForm();
+});
 
+uploadCancelButton.addEventListener("keydown", (evt) => {
+  if (evt.keyCode === 13) {
+    closeUploadForm();
+  }
+});
