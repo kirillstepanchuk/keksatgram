@@ -18,7 +18,54 @@ const DESCRIPTIONS = [
   "Отдыхаем...",
   "Цените каждое мгновенье. Цените тех, кто рядом с вами и отгоняйте все сомненья. Не обижайте всех словами......",
   "Вот это тачка!",
-]
+];
+
+const EFFECTS = {
+  none: {
+    name: "none",
+    filterName: "none",
+    minValue: 0,
+    maxValue: 0,
+    unit: "",
+  },
+  chrome: {
+    name: "chrome",
+    filterName: "grayscale",
+    minValue: 0,
+    maxValue: 1,
+    unit: "",
+  },
+  sepia: {
+    name: "sepia",
+    filterName: "sepia",
+    minValue: 0,
+    maxValue: 1,
+    unit: "",
+  },
+  marvin: {
+    name: "marvin",
+    filterName: "invert",
+    minValue: 0,
+    maxValue: 100,
+    unit: "%",
+  },
+  phobos: {
+    name: "phobos",
+    filterName: "blur",
+    minValue: 0,
+    maxValue: 5,
+    unit: "px",
+  },
+  heat: {
+    name: "heat",
+    filterName: "brightness",
+    minValue: 1,
+    maxValue: 3,
+    unit: "",
+  },
+};
+
+let currentEffect = "none";
 
 const MIN_LIKES_COUNT = 15;
 const MAX_LIKES_COUNT = 200;
@@ -29,6 +76,7 @@ const MIN_COMMENTS_COUNT = 0;
 const MAX_COMMENTS_COUNT = 10;
 const AVATAR_WIDTH = 35;
 const AVATAR_HEIGHT = 35;
+const MAX_EFFECT_VALUE = 100;
 const AVATAR_ALTERNATIVE_TEXT = "Аватар автора комментария";
 
 const postedPhotos = [];
@@ -38,6 +86,12 @@ const postedPhotos = [];
 const getRandomInteger = (min, max) => Math.floor(min + Math.random() * (max + 1 - min));
 
 const getRandomUnitFromList = (list) => list[getRandomInteger(0, list.length - 1)];
+
+const removeElementsFromList = (list) => {
+  while (list.firstChild) {
+    list.removeChild(list.firstChild);
+  }
+};
 
 const generateCommentsList = () => {
   const comments = [];
@@ -65,12 +119,12 @@ const generatePostedPhotos = () => {
   }
 };
 
-const createCommentImage = (elementNumber) => {
+const createCommentImage = (elementNumber, elementFromList) => {
   const commentImage = document.createElement("img");
 
   commentImage.classList.add("social__picture");
 
-  commentImage.src = postedPhotos[0].comments[elementNumber].avatar;
+  commentImage.src = postedPhotos[elementFromList].comments[elementNumber].avatar;
   commentImage.alt = AVATAR_ALTERNATIVE_TEXT;
   commentImage.width = AVATAR_WIDTH;
   commentImage.height = AVATAR_HEIGHT;
@@ -78,91 +132,63 @@ const createCommentImage = (elementNumber) => {
   return commentImage;
 };
 
-const createCommentText = (elementNumber) => {
+const createCommentText = (elementNumber, elementFromList) => {
   const commentText = document.createElement("p");
 
   commentText.classList.add("social__text");
 
-  commentText.textContent = postedPhotos[0].comments[elementNumber].message;
+  commentText.textContent = postedPhotos[elementFromList].comments[elementNumber].message;
 
   return commentText;
 };
 
-const createComment = (elementNumber) => {
+const createComment = (elementNumber, elementFromList) => {
   const commentElement = document.createElement("li");
 
   commentElement.classList.add("social__comment");
 
-  commentElement.append(createCommentImage(elementNumber));
-  commentElement.append(createCommentText(elementNumber));
+  commentElement.append(createCommentImage(elementNumber, elementFromList));
+  commentElement.append(createCommentText(elementNumber, elementFromList));
 
   return commentElement;
 };
 
-const removeElementsFromList = (list) => {
-  while (list.firstChild) {
-    list.removeChild(list.firstChild);
-  }
-};
+//calculate and return effect level for every effect
+const getEffectLevel = (effectName) => {
+  const effectLevelLineWidth = getComputedStyle(document.querySelector(".effect-level__line")).width;
+  const effectLevelDepthWidth = getComputedStyle(document.querySelector(".effect-level__pin")).left;
 
-const onUploadFormEscPress = (evt) => {
-  if (evt.keyCode === 27) {
-      uploadForm.classList.add("hidden")
-  }
+  const maxEffectLevelValue = +effectLevelLineWidth.substring(0, effectLevelLineWidth.length - 2);
+  const deptEffectLevelValue = +effectLevelDepthWidth.substring(0, effectLevelDepthWidth.length - 2);
+
+  const deptEffectLevelPercent = MAX_EFFECT_VALUE * deptEffectLevelValue / maxEffectLevelValue;
+
+  return (EFFECTS[effectName].maxValue - EFFECTS[effectName].minValue) * deptEffectLevelPercent / MAX_EFFECT_VALUE + EFFECTS[effectName].minValue;
 }
 
-const showUploadForm = () => {
-  uploadForm.classList.remove("hidden");
-  document.addEventListener("keydown", onUploadFormEscPress);
-}
+const bigPictureCard = document.querySelector(".big-picture");
+const bigPictureImage = bigPictureCard.querySelector(".big-picture__img img");
+const bigPictureLikes = bigPictureCard.querySelector(".likes-count");
+const bigPictureCommentsCount = bigPictureCard.querySelector(".comments-count");
+const bigPictureDescription = bigPictureCard.querySelector(".social__caption");
+const bigPictureCancelButton = bigPictureCard.querySelector("#picture-cancel");
 
-const closeUploadForm = () => {
-  uploadForm.classList.add("hidden");
-  document.removeEventListener("keydown", onUploadFormEscPress);
-  uploadInput.value = "";
-}
-
-generatePostedPhotos();
-
-const pictures = document.querySelector(".pictures");
-const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
-const pictureFragment = document.createDocumentFragment();
-
-for (let i = 0; i < postedPhotos.length; i++) {
-  const picture = pictureTemplate.cloneNode(true);
-  picture.querySelector(".picture__img").src = postedPhotos[i].url;
-  picture.querySelector(".picture__likes").textContent = postedPhotos[i].likes;
-  picture.querySelector(".picture__comments").textContent = postedPhotos[i].comments.length;
-  pictureFragment.append(picture);
-};
-
-pictures.append(pictureFragment);
-
-//big picture
-const showBigPicture = () =>{
-  const bigPictureCard = document.querySelector(".big-picture");
-  const bigPictureImage = bigPictureCard.querySelector(".big-picture__img img");
-  const bigPictureLikes = bigPictureCard.querySelector(".likes-count");
-  const bigPictureCommentsCount = bigPictureCard.querySelector(".comments-count");
-  const bigPictureDescription = bigPictureCard.querySelector(".social__caption");
-
+const showBigPicture = (elementFromList) => {
   bigPictureCard.classList.remove("hidden");
 
-  bigPictureImage.src = postedPhotos[0].url;
-  bigPictureLikes.textContent = postedPhotos[0].likes;
-  bigPictureCommentsCount.textContent = postedPhotos[0].comments.length;
-  bigPictureDescription.textContent = postedPhotos[0].description;
+  bigPictureImage.src = postedPhotos[elementFromList].url;
+  bigPictureLikes.textContent = postedPhotos[elementFromList].likes;
+  bigPictureCommentsCount.textContent = postedPhotos[elementFromList].comments.length;
+  bigPictureDescription.textContent = postedPhotos[elementFromList].description;
 
   //comments
-
   const socialCommens = bigPictureCard.querySelector(".social__comments");
-  const socialComment = socialCommens.querySelector(".social__comment");
   const commentFragment = document.createDocumentFragment();
 
   removeElementsFromList(socialCommens);
 
-  for (let i = 0; i < postedPhotos[0].comments.length; i++) {
-    const commentElement = createComment(i);
+  for (let i = 0; i < postedPhotos[elementFromList].comments.length; i++) {
+    const commentElement = createComment(i, elementFromList);
 
     commentFragment.append(commentElement);
   };
@@ -174,23 +200,143 @@ const showBigPicture = () =>{
 
   socialCommentsCount.classList.add("visually-hidden");
   socialCommentsLoaderButton.classList.add("visually-hidden");
+
+  document.addEventListener("keydown", onBigPictureEscPress);
+
+  bigPictureCancelButton.addEventListener("click", closeBigPicture);
+  bigPictureCancelButton.addEventListener("keydown", onBigPictureCancelButtonEnterPress);
 };
 
-//events
-const uploadInput = document.querySelector("#upload-file");
+const onPictureBlockClick = (evt) => {
+  showBigPicture(evt.currentTarget.dataset.number)
+};
+
+//big picture events
+const onBigPictureEscPress = (evt) => {
+  if (evt.keyCode === 27) {
+    closeBigPicture();
+  }
+};
+
+const onBigPictureCancelButtonEnterPress = (evt) => {
+  if (evt.keyCode === 13) {
+    closeBigPicture();
+  }
+};
+
+const closeBigPicture = () => {
+  bigPictureCard.classList.add("hidden");
+  document.removeEventListener("keydown", onBigPictureEscPress);
+
+  bigPictureCancelButton.removeEventListener("click", closeBigPicture);
+  bigPictureCancelButton.removeEventListener("keydown", onBigPictureCancelButtonEnterPress);
+};
+
+// Upload form events
 const uploadCancelButton = document.querySelector("#upload-cancel");
 const uploadForm = document.querySelector(".img-upload__overlay");
 
-uploadInput.addEventListener("change", () => {
-  showUploadForm();
-});
+const onUploadFormEscPress = (evt) => {
+  if (evt.keyCode === 27) {
+    closeUploadForm();
+  }
+};
 
-uploadCancelButton.addEventListener("click", () => {
-  closeUploadForm();
-});
-
-uploadCancelButton.addEventListener("keydown", (evt) => {
+const onUploadCancelButtonEnterPress = (evt) => {
   if (evt.keyCode === 13) {
     closeUploadForm();
   }
-});
+};
+
+const showUploadForm = () => {
+  effectLevelBlock.classList.add("hidden");
+  formPicture.className = "img-upload__preview";
+  formPicture.style = "";
+  uploadForm.classList.remove("hidden");
+  uploadCancelButton.addEventListener("click", closeUploadForm);
+  uploadCancelButton.addEventListener("keydown", onUploadCancelButtonEnterPress);
+  document.addEventListener("keydown", onUploadFormEscPress);
+};
+
+const closeUploadForm = () => {
+  uploadInput.value = "";
+  uploadForm.classList.add("hidden");
+  uploadCancelButton.removeEventListener("click", closeUploadForm);
+  uploadCancelButton.removeEventListener("keydown", onUploadCancelButtonEnterPress);
+  document.removeEventListener("keydown", onUploadFormEscPress);
+  effectLevelPin.removeEventListener("mouseup", onEffectLevelPinMouseup);
+};
+
+//effect events
+const formPicture = document.querySelector(".img-upload__preview");
+const effectLevelBlock = document.querySelector(".img-upload__effect-level");
+const effectLevelPin = effectLevelBlock.querySelector(".effect-level__pin");
+const effectLevelDepth = effectLevelBlock.querySelector(".effect-level__depth");
+const effectLevelValue = effectLevelBlock.querySelector(".effect-level__value");
+
+const addEffectLevel = (effectName) => {
+  formPicture.style.filter = EFFECTS[effectName].filterName + "(" + getEffectLevel(effectName) + EFFECTS[effectName].unit + ")";
+};
+
+const onEffectLevelPinMouseup = () => {
+  addEffectLevel(currentEffect);
+};
+
+const showEffect = () => {
+  formPicture.className = "img-upload__preview";
+  formPicture.style = "";
+
+  if (currentEffect == "none") {
+    effectLevelBlock.classList.add("hidden");
+  } else {
+    if (effectLevelBlock.classList.contains("hidden")) {
+      effectLevelBlock.classList.remove("hidden");
+    }
+
+    formPicture.classList.add(`effects__preview--${currentEffect}`);
+    effectLevelValue.setAttribute("value", MAX_EFFECT_VALUE);
+    effectLevelPin.style.left = `${MAX_EFFECT_VALUE}%`;
+    effectLevelDepth.style.width = `${MAX_EFFECT_VALUE}%`;
+    effectLevelPin.addEventListener("mouseup", onEffectLevelPinMouseup);
+  }
+};
+
+const onEffectButtonClick = (evt) => {
+  currentEffect = evt.currentTarget.querySelector("input").value;
+  showEffect();
+};
+
+const onUploadInputChange = () => showUploadForm();
+
+generatePostedPhotos();
+
+//show all pictures
+const picturesContainer = document.querySelector(".pictures");
+const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
+const pictureFragment = document.createDocumentFragment();
+
+for (let i = 0; i < postedPhotos.length; i++) {
+  const picture = pictureTemplate.cloneNode(true);
+  picture.dataset.number = i;
+  picture.querySelector(".picture__img").src = postedPhotos[i].url;
+  picture.querySelector(".picture__likes").textContent = postedPhotos[i].likes;
+  picture.querySelector(".picture__comments").textContent = postedPhotos[i].comments.length;
+  pictureFragment.append(picture);
+};
+
+picturesContainer.append(pictureFragment);
+
+//upload form
+const uploadInput = document.querySelector("#upload-file");
+
+uploadInput.addEventListener("change", onUploadInputChange);
+
+//add event showBigPicture for every picture
+const pictureBlocks = document.querySelectorAll(".picture");
+
+pictureBlocks.forEach(element => element.addEventListener("click", onPictureBlockClick));
+
+//effects
+const effectItems = document.querySelectorAll(".effects__item");
+
+effectItems.forEach(element => element.addEventListener("click", onEffectButtonClick));
