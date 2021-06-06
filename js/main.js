@@ -248,6 +248,8 @@ const onUploadCancelButtonEnterPress = (evt) => {
   }
 };
 
+const effectItems = document.querySelectorAll(".effects__item");
+
 const showUploadForm = () => {
   effectLevelBlock.classList.add("hidden");
   formPicture.className = "img-upload__preview";
@@ -256,6 +258,7 @@ const showUploadForm = () => {
   uploadCancelButton.addEventListener("click", closeUploadForm);
   uploadCancelButton.addEventListener("keydown", onUploadCancelButtonEnterPress);
   document.addEventListener("keydown", onUploadFormEscPress);
+  effectItems.forEach(element => element.addEventListener("click", onEffectButtonClick));
 };
 
 const closeUploadForm = () => {
@@ -265,6 +268,7 @@ const closeUploadForm = () => {
   uploadCancelButton.removeEventListener("keydown", onUploadCancelButtonEnterPress);
   document.removeEventListener("keydown", onUploadFormEscPress);
   effectLevelPin.removeEventListener("mouseup", onEffectLevelPinMouseup);
+  effectItems.forEach(element => element.removeEventListener("click", onEffectButtonClick));
 };
 
 //effect events
@@ -336,7 +340,4 @@ const pictureBlocks = document.querySelectorAll(".picture");
 
 pictureBlocks.forEach(element => element.addEventListener("click", onPictureBlockClick));
 
-//effects
-const effectItems = document.querySelectorAll(".effects__item");
 
-effectItems.forEach(element => element.addEventListener("click", onEffectButtonClick));
