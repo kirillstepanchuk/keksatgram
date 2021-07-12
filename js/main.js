@@ -77,7 +77,11 @@ const MAX_COMMENTS_COUNT = 10;
 const AVATAR_WIDTH = 35;
 const AVATAR_HEIGHT = 35;
 const MAX_EFFECT_VALUE = 100;
+const MAX_HASHTAGS_COUNT = 5;
+const MAX_HASHTAG_LENGTH = 20;
 const AVATAR_ALTERNATIVE_TEXT = "Аватар автора комментария";
+const ESC_KEY_NAME = "Escape";
+const ENTER_KEY_NAME = "Enter";
 
 const postedPhotos = [];
 
@@ -91,6 +95,14 @@ const removeElementsFromList = (list) => {
   while (list.firstChild) {
     list.removeChild(list.firstChild);
   }
+};
+
+const getCountSimilarElementsInList = (numsArr, target) => {
+  let count = 0;
+  for (let i = 0; i < numsArr.length; i++) {
+    if (numsArr[i] == target) count++
+  }
+  return count;
 };
 
 const generateCommentsList = () => {
@@ -119,12 +131,12 @@ const generatePostedPhotos = () => {
   }
 };
 
-const createCommentImage = (elementNumber, elementFromList) => {
+const createCommentImage = (avatarData) => {
   const commentImage = document.createElement("img");
 
   commentImage.classList.add("social__picture");
 
-  commentImage.src = postedPhotos[elementFromList].comments[elementNumber].avatar;
+  commentImage.src = avatarData;
   commentImage.alt = AVATAR_ALTERNATIVE_TEXT;
   commentImage.width = AVATAR_WIDTH;
   commentImage.height = AVATAR_HEIGHT;
@@ -132,30 +144,30 @@ const createCommentImage = (elementNumber, elementFromList) => {
   return commentImage;
 };
 
-const createCommentText = (elementNumber, elementFromList) => {
+const createCommentText = (messageData) => {
   const commentText = document.createElement("p");
 
   commentText.classList.add("social__text");
 
-  commentText.textContent = postedPhotos[elementFromList].comments[elementNumber].message;
+  commentText.textContent = messageData;
 
   return commentText;
 };
 
-const createComment = (elementNumber, elementFromList) => {
+const createComment = (commentData) => {
   const commentElement = document.createElement("li");
 
   commentElement.classList.add("social__comment");
 
-  commentElement.append(createCommentImage(elementNumber, elementFromList));
-  commentElement.append(createCommentText(elementNumber, elementFromList));
+  commentElement.append(createCommentImage(commentData.avatar));
+  commentElement.append(createCommentText(commentData.message));
 
   return commentElement;
 };
 
 //calculate and return effect level for every effect
 const getEffectLevel = (effectName) => {
-  const effectLevelLineWidth = getComputedStyle(document.querySelector(".effect-level__line")).width;
+  const effectLevelLineWidth = getComputedStyle(document.querySelector(".effect-level__line")).width;//get bounsing
   const effectLevelDepthWidth = getComputedStyle(document.querySelector(".effect-level__pin")).left;
 
   const maxEffectLevelValue = +effectLevelLineWidth.substring(0, effectLevelLineWidth.length - 2);
@@ -173,13 +185,13 @@ const bigPictureCommentsCount = bigPictureCard.querySelector(".comments-count");
 const bigPictureDescription = bigPictureCard.querySelector(".social__caption");
 const bigPictureCancelButton = bigPictureCard.querySelector("#picture-cancel");
 
-const showBigPicture = (elementFromList) => {
+const showBigPicture = (pictureData) => {
   bigPictureCard.classList.remove("hidden");
 
-  bigPictureImage.src = postedPhotos[elementFromList].url;
-  bigPictureLikes.textContent = postedPhotos[elementFromList].likes;
-  bigPictureCommentsCount.textContent = postedPhotos[elementFromList].comments.length;
-  bigPictureDescription.textContent = postedPhotos[elementFromList].description;
+  bigPictureImage.src = pictureData.url;
+  bigPictureLikes.textContent = pictureData.likes;
+  bigPictureCommentsCount.textContent = pictureData.comments.length;
+  bigPictureDescription.textContent = pictureData.description;
 
   //comments
   const socialCommens = bigPictureCard.querySelector(".social__comments");
@@ -187,39 +199,42 @@ const showBigPicture = (elementFromList) => {
 
   removeElementsFromList(socialCommens);
 
-  for (let i = 0; i < postedPhotos[elementFromList].comments.length; i++) {
-    const commentElement = createComment(i, elementFromList);
-
-    commentFragment.append(commentElement);
-  };
+  pictureData.comments.forEach((comment) => {
+    commentFragment.append(createComment(comment));
+  });
 
   socialCommens.append(commentFragment);
 
   const socialCommentsCount = bigPictureCard.querySelector(".social__comment-count");
   const socialCommentsLoaderButton = bigPictureCard.querySelector(".comments-loader");
 
+  //temporary solution--
   socialCommentsCount.classList.add("visually-hidden");
   socialCommentsLoaderButton.classList.add("visually-hidden");
-
+  //--
   document.addEventListener("keydown", onBigPictureEscPress);
 
-  bigPictureCancelButton.addEventListener("click", closeBigPicture);
+  bigPictureCancelButton.addEventListener("click", onBigPictureCancelButtonClick);
   bigPictureCancelButton.addEventListener("keydown", onBigPictureCancelButtonEnterPress);
 };
 
 const onPictureBlockClick = (evt) => {
-  showBigPicture(evt.currentTarget.dataset.number)
+  showBigPicture(postedPhotos[evt.currentTarget.dataset.number])
 };
 
 //big picture events
 const onBigPictureEscPress = (evt) => {
-  if (evt.keyCode === 27) {
+  if (evt.key === ESC_KEY_NAME) {
     closeBigPicture();
   }
 };
 
+const onBigPictureCancelButtonClick = () => {
+  closeBigPicture();
+};
+
 const onBigPictureCancelButtonEnterPress = (evt) => {
-  if (evt.keyCode === 13) {
+  if (evt.key === ENTER_KEY_NAME) {
     closeBigPicture();
   }
 };
@@ -228,7 +243,7 @@ const closeBigPicture = () => {
   bigPictureCard.classList.add("hidden");
   document.removeEventListener("keydown", onBigPictureEscPress);
 
-  bigPictureCancelButton.removeEventListener("click", closeBigPicture);
+  bigPictureCancelButton.removeEventListener("click", onBigPictureCancelButtonClick);
   bigPictureCancelButton.removeEventListener("keydown", onBigPictureCancelButtonEnterPress);
 };
 
@@ -236,14 +251,19 @@ const closeBigPicture = () => {
 const uploadCancelButton = document.querySelector("#upload-cancel");
 const uploadForm = document.querySelector(".img-upload__overlay");
 
+
+const onUploadCancelButtonClick = () => {
+  closeUploadForm();
+}
+
 const onUploadFormEscPress = (evt) => {
-  if (evt.keyCode === 27) {
+  if (evt.key === ESC_KEY_NAME) {
     closeUploadForm();
   }
 };
 
 const onUploadCancelButtonEnterPress = (evt) => {
-  if (evt.keyCode === 13) {
+  if (evt.key === ENTER_KEY_NAME) {
     closeUploadForm();
   }
 };
@@ -255,16 +275,22 @@ const showUploadForm = () => {
   formPicture.className = "img-upload__preview";
   formPicture.style = "";
   uploadForm.classList.remove("hidden");
-  uploadCancelButton.addEventListener("click", closeUploadForm);
+  uploadCancelButton.addEventListener("click", onUploadCancelButtonClick);
   uploadCancelButton.addEventListener("keydown", onUploadCancelButtonEnterPress);
   document.addEventListener("keydown", onUploadFormEscPress);
   effectItems.forEach(element => element.addEventListener("click", onEffectButtonClick));
 };
 
+const uploadPictureInput = document.querySelector("#upload-file");
+const uploadHashtagsInput = document.querySelector(".text__hashtags");
+const uploadDescriptionInput = document.querySelector(".text__description");
+
 const closeUploadForm = () => {
-  uploadInput.value = "";
+  uploadPictureInput.value = "";
+  uploadHashtagsInput.value = "";
+  uploadDescriptionInput.value = "";
   uploadForm.classList.add("hidden");
-  uploadCancelButton.removeEventListener("click", closeUploadForm);
+  uploadCancelButton.removeEventListener("click", onUploadCancelButtonClick);
   uploadCancelButton.removeEventListener("keydown", onUploadCancelButtonEnterPress);
   document.removeEventListener("keydown", onUploadFormEscPress);
   effectLevelPin.removeEventListener("mouseup", onEffectLevelPinMouseup);
@@ -310,7 +336,9 @@ const onEffectButtonClick = (evt) => {
   showEffect();
 };
 
-const onUploadInputChange = () => showUploadForm();
+const onUploadInputChange = () => {
+  showUploadForm();
+};
 
 generatePostedPhotos();
 
@@ -331,13 +359,93 @@ for (let i = 0; i < postedPhotos.length; i++) {
 picturesContainer.append(pictureFragment);
 
 //upload form
-const uploadInput = document.querySelector("#upload-file");
 
-uploadInput.addEventListener("change", onUploadInputChange);
+uploadPictureInput.addEventListener("change", onUploadInputChange);
 
 //add event showBigPicture for every picture
 const pictureBlocks = document.querySelectorAll(".picture");
 
 pictureBlocks.forEach(element => element.addEventListener("click", onPictureBlockClick));
+
+//hashtags
+
+const ErrorNameToErrorDescription = {
+  tagContainsOnlySharp: "Хештег состоит только из решетки. ",
+  similarTags: "Имеются одинаковые хештеги. ",
+  noSpacesBetweenTags: "Хештеги должны разделяться пробелами. ",
+  moreThan20Letters: "Хештег более 20 символов. ",
+  moreThan5Tags: "Указано больше 5 хештегов. ",
+  hashtagDoesNotStartWithSharp: "Хештеги должны начинаться с #. ",
+};
+
+const errorsState = Object.assign({}, ErrorNameToErrorDescription);
+
+for (let key in errorsState) {
+  errorsState[key] = false;
+};
+
+const isHashtagStartWithSharp = (hashTag, input) => {
+  return hashTag[0] !== "#" && input.value !== "";
+};
+
+const isTagContainsOnlySharp = (hashTag) => {
+  return hashTag === "#";
+};
+
+const isSpacesBetweenTags = (hashTag) => {
+  return hashTag.split("#").length - 1 > 1;
+};
+
+const isMoreThan20Letters = (hashTag) => {
+  return hashTag.length > MAX_HASHTAG_LENGTH;
+};
+
+const isSimilarTags = (hashTagList, hashTag) => {
+  return getCountSimilarElementsInList(hashTagList, hashTag) > 1;
+};
+
+const isMoreThan5Tags = (hashTagList) => {
+  return hashTagList.length > MAX_HASHTAGS_COUNT;
+};
+
+const checkHashtagsValidity = () => {
+  for (let key in errorsState) {
+    errorsState[key] = false;
+  };
+
+  const hashTags = uploadHashtagsInput.value.split(" ");
+
+  errorsState.moreThan5Tags = errorsState.moreThan5Tags || isMoreThan5Tags(hashTags);
+
+  for (let i = 0; i < hashTags.length; i++) {
+    errorsState.hashtagDoesNotStartWithSharp = errorsState.hashtagDoesNotStartWithSharp || isHashtagStartWithSharp(hashTags[i], uploadHashtagsInput);
+    errorsState.tagContainsOnlySharp = errorsState.tagContainsOnlySharp || isTagContainsOnlySharp(hashTags[i]);
+    errorsState.noSpacesBetweenTags = errorsState.noSpacesBetweenTags || isSpacesBetweenTags(hashTags[i]);
+    errorsState.moreThan20Letters = errorsState.moreThan20Letters || isMoreThan20Letters(hashTags[i]);
+    errorsState.similarTags = errorsState.similarTags || isSimilarTags(hashTags, hashTags[i]);
+  };
+};
+
+const createErrorMessage = () => {
+  let errorMessage = "";
+
+  for (let key in errorsState) {
+    if (errorsState[key] === true) {
+      errorMessage = errorMessage + ErrorNameToErrorDescription[key];
+    }
+  }
+  return errorMessage;
+};
+
+const uploadFormSubmitButton = uploadForm.querySelector(".img-upload__submit");
+
+uploadFormSubmitButton.addEventListener("click", () => {
+  checkHashtagsValidity();
+  console.log(errorsState);
+  console.log(createErrorMessage());
+  uploadHashtagsInput.setCustomValidity(createErrorMessage());
+});
+
+
 
 
