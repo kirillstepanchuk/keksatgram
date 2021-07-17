@@ -86,7 +86,6 @@ const ENTER_KEY_NAME = "Enter";
 const postedPhotos = [];
 
 //functions
-
 const getRandomInteger = (min, max) => Math.floor(min + Math.random() * (max + 1 - min));
 
 const getRandomUnitFromList = (list) => list[getRandomInteger(0, list.length - 1)];
@@ -166,16 +165,13 @@ const createComment = (commentData) => {
 };
 
 //calculate and return effect level for every effect
-const getEffectLevel = (effectName) => {
-  const effectLevelLineWidth = getComputedStyle(document.querySelector(".effect-level__line")).width;//get bounsing
-  const effectLevelDepthWidth = getComputedStyle(document.querySelector(".effect-level__pin")).left;
-
-  const maxEffectLevelValue = +effectLevelLineWidth.substring(0, effectLevelLineWidth.length - 2);
-  const deptEffectLevelValue = +effectLevelDepthWidth.substring(0, effectLevelDepthWidth.length - 2);
+const getEffectLevel = () => {
+  const maxEffectLevelValue = effectLevelLine.offsetWidth;
+  const deptEffectLevelValue = effectLevelDepth.offsetWidth;
 
   const deptEffectLevelPercent = MAX_EFFECT_VALUE * deptEffectLevelValue / maxEffectLevelValue;
 
-  return (EFFECTS[effectName].maxValue - EFFECTS[effectName].minValue) * deptEffectLevelPercent / MAX_EFFECT_VALUE + EFFECTS[effectName].minValue;
+  return (EFFECTS[currentEffect].maxValue - EFFECTS[currentEffect].minValue) * deptEffectLevelPercent / MAX_EFFECT_VALUE + EFFECTS[currentEffect].minValue;
 }
 
 const bigPictureCard = document.querySelector(".big-picture");
@@ -298,18 +294,20 @@ const closeUploadForm = () => {
 };
 
 //effect events
+
 const formPicture = document.querySelector(".img-upload__preview");
 const effectLevelBlock = document.querySelector(".img-upload__effect-level");
+const effectLevelLine = document.querySelector(".effect-level__line");
 const effectLevelPin = effectLevelBlock.querySelector(".effect-level__pin");
 const effectLevelDepth = effectLevelBlock.querySelector(".effect-level__depth");
 const effectLevelValue = effectLevelBlock.querySelector(".effect-level__value");
 
-const addEffectLevel = (effectName) => {
-  formPicture.style.filter = EFFECTS[effectName].filterName + "(" + getEffectLevel(effectName) + EFFECTS[effectName].unit + ")";
+const addEffectLevel = () => {
+  formPicture.style.filter = EFFECTS[currentEffect].filterName + "(" + getEffectLevel(currentEffect) + EFFECTS[currentEffect].unit + ")";
 };
 
 const onEffectLevelPinMouseup = () => {
-  addEffectLevel(currentEffect);
+  addEffectLevel();
 };
 
 const showEffect = () => {
@@ -342,6 +340,48 @@ const onUploadInputChange = () => {
 
 generatePostedPhotos();
 
+//slider effects
+const onEffectLevelPinMouseDown = (downEvt) => {
+  downEvt.preventDefault();
+
+  const effectLevelLineLeftCoordinate = effectLevelLine.getBoundingClientRect().left;
+
+  const setEffectOptions = (effectEvt) => {
+    const maxLeft = effectLevelLine.offsetWidth;
+    let currentLeft = effectEvt.clientX - effectLevelLineLeftCoordinate;
+
+    if (currentLeft < 0) {
+      currentLeft = 0;
+    };
+
+    if (currentLeft > maxLeft) {
+      currentLeft = maxLeft;
+    };
+
+    effectLevelPin.style.left = `${currentLeft}px`;
+    effectLevelDepth.style.width = `${currentLeft}px`;
+    addEffectLevel();
+  };
+
+  const onMouseMove = (moveEvt) => {
+    setEffectOptions(moveEvt);
+  };
+
+  const onMouseUp = (upEvt) => {
+    upEvt.preventDefault();
+
+    setEffectOptions(upEvt);
+
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+  };
+
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
+};
+
+effectLevelPin.addEventListener("mousedown", onEffectLevelPinMouseDown);
+
 //show all pictures
 const picturesContainer = document.querySelector(".pictures");
 const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
@@ -359,7 +399,6 @@ for (let i = 0; i < postedPhotos.length; i++) {
 picturesContainer.append(pictureFragment);
 
 //upload form
-
 uploadPictureInput.addEventListener("change", onUploadInputChange);
 
 //add event showBigPicture for every picture
@@ -368,7 +407,6 @@ const pictureBlocks = document.querySelectorAll(".picture");
 pictureBlocks.forEach(element => element.addEventListener("click", onPictureBlockClick));
 
 //hashtags
-
 const ErrorNameToErrorDescription = {
   tagContainsOnlySharp: "Хештег состоит только из решетки. ",
   similarTags: "Имеются одинаковые хештеги. ",
@@ -441,11 +479,5 @@ const uploadFormSubmitButton = uploadForm.querySelector(".img-upload__submit");
 
 uploadFormSubmitButton.addEventListener("click", () => {
   checkHashtagsValidity();
-  console.log(errorsState);
-  console.log(createErrorMessage());
   uploadHashtagsInput.setCustomValidity(createErrorMessage());
 });
-
-
-
-
