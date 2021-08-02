@@ -32,7 +32,7 @@
   const AVATAR_HEIGHT = 35;
   const AVATAR_ALTERNATIVE_TEXT = "Аватар автора комментария";
 
-  const postedPhotos = [];
+  let postedPhotos = [];
 
   //functions
   const getRandomInteger = (min, max) => Math.floor(min + Math.random() * (max + 1 - min));
@@ -104,32 +104,64 @@
     return commentElement;
   };
 
-  generatePostedPhotos();
+  //generatePostedPhotos();
 
-  //show all pictures
-  const picturesContainer = document.querySelector(".pictures");
-  const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
-  const pictureFragment = document.createDocumentFragment();
+  const successHandler = (pictureData) => {
+    const picturesContainer = document.querySelector(".pictures");
+    const pictureFragment = document.createDocumentFragment();
 
-  for (let i = 0; i < postedPhotos.length; i++) {
-    const picture = pictureTemplate.cloneNode(true);
-    picture.dataset.number = i;
-    picture.querySelector(".picture__img").src = postedPhotos[i].url;
-    picture.querySelector(".picture__likes").textContent = postedPhotos[i].likes;
-    picture.querySelector(".picture__comments").textContent = postedPhotos[i].comments.length;
-    pictureFragment.append(picture);
+    for (let i = 0; i < PHOTOS_COUNT; i++) {
+      const renderedPicture = renderPicture(pictureData[i]);
+      renderedPicture.dataset.number = i;
+
+      pictureFragment.append(renderedPicture);
+      postedPhotos.push(pictureData[i]);
+    };
+    console.log('postedPhotos: ', postedPhotos);
+
+    picturesContainer.append(pictureFragment);
+
+    const pictureBlocks = document.querySelectorAll(".picture");
+    pictureBlocks.forEach(element => element.addEventListener("click", onPictureBlockClick));
+
   };
 
-  picturesContainer.append(pictureFragment);
+  const errorHandler = (errorMessage) => {
+    let errorNode = document.createElement('div');
+    errorNode.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red';
+    errorNode.style.position = 'absolute';
+    errorNode.style.left = 0;
+    errorNode.style.right = 0;
+    errorNode.style.fontSize = '20px';
 
+    errorNode.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', errorNode);
+
+    console.log(errorMessage);
+  };
+
+  window.backend.load(successHandler, errorHandler);
+  console.log('postedPhotos: ', postedPhotos);
+
+  const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
+
+  const renderPicture = (pictureInfo) => {
+    const picture = pictureTemplate.cloneNode(true);
+
+    picture.querySelector(".picture__img").src = pictureInfo.url;
+    picture.querySelector(".picture__likes").textContent = pictureInfo.likes;
+    picture.querySelector(".picture__comments").textContent = pictureInfo.comments.length;
+
+    return picture;
+  }
   //add event showBigPicture for every picture
   const onPictureBlockClick = (evt) => {
     showBigPicture(postedPhotos[evt.currentTarget.dataset.number])
   };
 
-  const pictureBlocks = document.querySelectorAll(".picture");
 
-  pictureBlocks.forEach(element => element.addEventListener("click", onPictureBlockClick));
+
+
 
   //big picture
   const bigPictureCard = document.querySelector(".big-picture");
