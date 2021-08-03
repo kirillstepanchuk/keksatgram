@@ -22,7 +22,6 @@
 
         if (response.ok) {
             let json = await response.json();
-            console.log('json: ', json);
             onLoad(json);
         } else {
             onError(`Статус ответа: ${response.status} ${response.statusText}`)

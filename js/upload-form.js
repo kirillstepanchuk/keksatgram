@@ -58,28 +58,12 @@
         const deptEffectLevelPercent = MAX_EFFECT_VALUE * deptEffectLevelValue / maxEffectLevelValue;
 
         return (EFFECTS[currentEffect].maxValue - EFFECTS[currentEffect].minValue) * deptEffectLevelPercent / MAX_EFFECT_VALUE + EFFECTS[currentEffect].minValue;
-    }
+    };
+
+
 
     const uploadCancelButton = document.querySelector("#upload-cancel");
     const uploadOverlay = document.querySelector(".img-upload__overlay");
-
-
-    const onUploadCancelButtonClick = () => {
-        closeUploadOverlay();
-    }
-
-    const onUploadOverlayEscPress = (evt) => {
-        if (window.utils.isEscKey(evt)) {
-            closeUploadOverlay();
-        }
-    };
-
-    const onUploadCancelButtonEnterPress = (evt) => {
-        if (window.utils.isEnterKey(evt)) {
-            closeUploadOverlay();
-        }
-    };
-
     const effectItems = document.querySelectorAll(".effects__item");
 
     const showUploadOverlay = () => {
@@ -109,6 +93,22 @@
         effectItems.forEach(element => element.removeEventListener("click", onEffectButtonClick));
     };
 
+    const onUploadCancelButtonClick = () => {
+        closeUploadOverlay();
+    };
+
+    const onUploadOverlayEscPress = (evt) => {
+        if (window.utils.isEscKey(evt)) {
+            closeUploadOverlay();
+        }
+    };
+
+    const onUploadCancelButtonEnterPress = (evt) => {
+        if (window.utils.isEnterKey(evt)) {
+            closeUploadOverlay();
+        }
+    };
+
     const formPicture = document.querySelector(".img-upload__preview");
     const effectLevelBlock = document.querySelector(".img-upload__effect-level");
     const effectLevelLine = document.querySelector(".effect-level__line");
@@ -133,14 +133,14 @@
         } else {
             if (effectLevelBlock.classList.contains("hidden")) {
                 effectLevelBlock.classList.remove("hidden");
-            }
+            };
 
             formPicture.classList.add(`effects__preview--${currentEffect}`);
             effectLevelValue.setAttribute("value", MAX_EFFECT_VALUE);
             effectLevelPin.style.left = `${MAX_EFFECT_VALUE}%`;
             effectLevelDepth.style.width = `${MAX_EFFECT_VALUE}%`;
             effectLevelPin.addEventListener("mouseup", onEffectLevelPinMouseup);
-        }
+        };
     };
 
     const onEffectButtonClick = (evt) => {
@@ -172,6 +172,7 @@
 
             effectLevelPin.style.left = `${currentLeft}px`;
             effectLevelDepth.style.width = `${currentLeft}px`;
+
             addEffectLevel();
         };
 
@@ -216,17 +217,20 @@
 
     const onUploadErrorTryAgainButtonClick = () => {
         document.querySelector(".error").remove();
+
         showUploadOverlay();
     };
 
     const onUploadErrorUploadNewFileButtonClick = () => {
         document.querySelector(".error").remove();
+
         uploadPictureInput.value = "";
         uploadPictureInput.click();
     };
 
     const uploadForm = document.querySelector(".img-upload__form");
     const errorTemplate = document.querySelector("#error").content.querySelector(".error");
+    const errorButtons = errorTemplate.querySelectorAll(".error__button");
     const successTemplate = document.querySelector("#success").content.querySelector(".success");
 
     const successHandler = () => {
@@ -241,34 +245,36 @@
     };
 
     const errorHandler = (errorText) => {
-        errorTemplate.querySelector('.error__title').textContent = errorText;
+        uploadOverlay.classList.add('hidden');
+
+        errorTemplate.querySelector(".error__title").textContent = errorText;
 
         const errorMessage = errorTemplate.cloneNode(true);
 
-        document.querySelector('main').insertAdjacentElement('afterbegin', errorMessage);
+        document.querySelector("main").insertAdjacentElement("afterbegin", errorMessage);
 
         document.addEventListener('keydown', onUploadErrorEscPress);
-        document.querySelectorAll('.error__button')[0].addEventListener('click', onUploadErrorTryAgainButtonClick)
-        document.querySelectorAll('.error__button')[1].addEventListener('click', onUploadErrorUploadNewFileButtonClick)
+
+        errorButtons[0].addEventListener("click", onUploadErrorTryAgainButtonClick);
+        errorButtons[1].addEventListener("click", onUploadErrorUploadNewFileButtonClick);
     };
 
-
-    uploadForm.addEventListener('submit', (evt) => {
+    uploadForm.addEventListener("submit", (evt) => {
         evt.preventDefault();
         window.backend.upload(new FormData(uploadForm), successHandler, errorHandler);
     })
 
-
     //hashtags
-
     const MAX_HASHTAGS_COUNT = 5;
     const MAX_HASHTAG_LENGTH = 20;
 
     const getCountSimilarElementsInList = (numsArr, target) => {
         let count = 0;
+
         for (let i = 0; i < numsArr.length; i++) {
             if (numsArr[i] == target) count++
-        }
+        };
+
         return count;
     };
 
