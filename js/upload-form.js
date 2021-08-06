@@ -60,20 +60,23 @@
         return (EFFECTS[currentEffect].maxValue - EFFECTS[currentEffect].minValue) * deptEffectLevelPercent / MAX_EFFECT_VALUE + EFFECTS[currentEffect].minValue;
     };
 
-
-
     const uploadCancelButton = document.querySelector("#upload-cancel");
     const uploadOverlay = document.querySelector(".img-upload__overlay");
     const effectItems = document.querySelectorAll(".effects__item");
 
     const showUploadOverlay = () => {
         effectLevelBlock.classList.add("hidden");
+
         formPicture.className = "img-upload__preview";
+
         formPicture.style = "";
+
         uploadOverlay.classList.remove("hidden");
+
         uploadCancelButton.addEventListener("click", onUploadCancelButtonClick);
         uploadCancelButton.addEventListener("keydown", onUploadCancelButtonEnterPress);
         document.addEventListener("keydown", onUploadOverlayEscPress);
+
         effectItems.forEach(element => element.addEventListener("click", onEffectButtonClick));
     };
 
@@ -85,11 +88,15 @@
         uploadPictureInput.value = "";
         uploadHashtagsInput.value = "";
         uploadDescriptionInput.value = "";
+
         uploadOverlay.classList.add("hidden");
+
         uploadCancelButton.removeEventListener("click", onUploadCancelButtonClick);
         uploadCancelButton.removeEventListener("keydown", onUploadCancelButtonEnterPress);
         document.removeEventListener("keydown", onUploadOverlayEscPress);
         effectLevelPin.removeEventListener("mouseup", onEffectLevelPinMouseup);
+        uploadFormSubmitButton.removeEventListener("click", onuploadFormSubmitButtonClick);
+
         effectItems.forEach(element => element.removeEventListener("click", onEffectButtonClick));
     };
 
@@ -199,30 +206,45 @@
     uploadPictureInput.addEventListener("change", onUploadInputChange);
 
 
+    const closeUploadSuccess = () => {
+        document.removeEventListener("keydown", onUploadSuccessEscPress);
+        document.querySelector(".success__button").removeEventListener("click", onUploadSuccessButtonClick);
+
+        document.querySelector(".success").remove();
+    };
+
+    const closeUploadError = () => {
+        document.removeEventListener('keydown', onUploadErrorEscPress);
+        errorTemplate.querySelectorAll(".error__button")[0].removeEventListener("click", onUploadErrorTryAgainButtonClick);
+        errorTemplate.querySelectorAll(".error__button")[1].removeEventListener("click", onUploadErrorUploadNewFileButtonClick);
+
+        document.querySelector(".error").remove();
+    }
+
     const onUploadSuccessEscPress = (evt) => {
         if (window.utils.isEscKey(evt)) {
-            document.querySelector(".success").remove();
+            closeUploadSuccess();
         }
     };
 
     const onUploadSuccessButtonClick = () => {
-        document.querySelector(".success").remove();
+        closeUploadSuccess();
     };
 
     const onUploadErrorEscPress = (evt) => {
         if (window.utils.isEscKey(evt)) {
-            document.querySelector(".error").remove();
+            closeUploadError();
         }
     };
 
     const onUploadErrorTryAgainButtonClick = () => {
-        document.querySelector(".error").remove();
+        closeUploadError();
 
         showUploadOverlay();
     };
 
     const onUploadErrorUploadNewFileButtonClick = () => {
-        document.querySelector(".error").remove();
+        closeUploadError();
 
         uploadPictureInput.value = "";
         uploadPictureInput.click();
@@ -230,7 +252,6 @@
 
     const uploadForm = document.querySelector(".img-upload__form");
     const errorTemplate = document.querySelector("#error").content.querySelector(".error");
-    const errorButtons = errorTemplate.querySelectorAll(".error__button");
     const successTemplate = document.querySelector("#success").content.querySelector(".success");
 
     const successHandler = () => {
@@ -254,9 +275,8 @@
         document.querySelector("main").insertAdjacentElement("afterbegin", errorMessage);
 
         document.addEventListener('keydown', onUploadErrorEscPress);
-
-        errorButtons[0].addEventListener("click", onUploadErrorTryAgainButtonClick);
-        errorButtons[1].addEventListener("click", onUploadErrorUploadNewFileButtonClick);
+        errorTemplate.querySelectorAll(".error__button")[0].addEventListener("click", onUploadErrorTryAgainButtonClick);
+        errorTemplate.querySelectorAll(".error__button")[1].addEventListener("click", onUploadErrorUploadNewFileButtonClick);
     };
 
     uploadForm.addEventListener("submit", (evt) => {
@@ -348,8 +368,10 @@
 
     const uploadFormSubmitButton = uploadOverlay.querySelector(".img-upload__submit");
 
-    uploadFormSubmitButton.addEventListener("click", () => {
+    const onuploadFormSubmitButtonClick = () => {
         checkHashtagsValidity();
         uploadHashtagsInput.setCustomValidity(createErrorMessage());
-    });
+    };
+
+    uploadFormSubmitButton.addEventListener("click", onuploadFormSubmitButtonClick);
 })();

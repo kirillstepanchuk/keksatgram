@@ -25,23 +25,12 @@
   // const MAX_LIKES_COUNT = 200;
   // const MIN_AVATAR_COUNT = 1;
   // const MAX_AVATAR_COUNT = 6;
-  const PHOTOS_COUNT = 25;
+
   //const MIN_COMMENTS_COUNT = 0;
   //const MAX_COMMENTS_COUNT = 10;
   const AVATAR_WIDTH = 35;
   const AVATAR_HEIGHT = 35;
   const AVATAR_ALTERNATIVE_TEXT = "Аватар автора комментария";
-
-  let postedPhotos = [];
-
-  //functions
-  const getRandomInteger = (min, max) => {
-    return Math.floor(min + Math.random() * (max + 1 - min))
-  };
-
-  const getRandomUnitFromList = (list) => {
-    return list[getRandomInteger(0, list.length - 1)]
-  };
 
   const removeElementsFromList = (list) => {
     while (list.firstChild) {
@@ -110,56 +99,6 @@
 
   //generatePostedPhotos();
 
-  const successHandler = (pictureData) => {
-    const picturesContainer = document.querySelector(".pictures");
-    const pictureFragment = document.createDocumentFragment();
-
-    for (let i = 0; i < PHOTOS_COUNT; i++) {
-      const renderedPicture = renderPicture(pictureData[i]);
-      renderedPicture.dataset.number = i;
-
-      pictureFragment.append(renderedPicture);
-      postedPhotos.push(pictureData[i]);
-    };
-    picturesContainer.append(pictureFragment);
-
-    const pictureBlocks = document.querySelectorAll(".picture");
-
-    pictureBlocks.forEach(element => element.addEventListener("click", onPictureBlockClick));
-  };
-
-  const errorHandler = (errorMessage) => {
-    let errorNode = document.createElement('div');
-    errorNode.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red';
-    errorNode.style.position = 'absolute';
-    errorNode.style.left = 0;
-    errorNode.style.right = 0;
-    errorNode.style.fontSize = '20px';
-
-    errorNode.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', errorNode);
-
-    console.log(errorMessage);
-  };
-
-  window.backend.load(successHandler, errorHandler);
-
-  const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
-
-  const renderPicture = (pictureInfo) => {
-    const picture = pictureTemplate.cloneNode(true);
-
-    picture.querySelector(".picture__img").src = pictureInfo.url;
-    picture.querySelector(".picture__likes").textContent = pictureInfo.likes;
-    picture.querySelector(".picture__comments").textContent = pictureInfo.comments.length;
-
-    return picture;
-  }
-
-  const onPictureBlockClick = (evt) => {
-    showBigPicture(postedPhotos[evt.currentTarget.dataset.number])
-  };
-
   const bigPictureCard = document.querySelector(".big-picture");
   const bigPictureImage = bigPictureCard.querySelector(".big-picture__img img");
   const bigPictureLikes = bigPictureCard.querySelector(".likes-count");
@@ -167,7 +106,7 @@
   const bigPictureDescription = bigPictureCard.querySelector(".social__caption");
   const bigPictureCancelButton = bigPictureCard.querySelector("#picture-cancel");
 
-  const showBigPicture = (pictureData) => {
+  window.showBigPicture = (pictureData) => {
     bigPictureCard.classList.remove("hidden");
 
     bigPictureImage.src = pictureData.url;
