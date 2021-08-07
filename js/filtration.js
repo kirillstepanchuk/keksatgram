@@ -9,6 +9,19 @@
     let newPhotos = [];
     let discussedPhotos = [];
 
+    const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
+
+    const renderPicture = (pictureInfo) => {
+        const picture = pictureTemplate.cloneNode(true);
+
+        picture.querySelector(".picture__img").src = pictureInfo.url;
+        picture.querySelector(".picture__likes").textContent = pictureInfo.likes;
+        picture.querySelector(".picture__comments").textContent = pictureInfo.comments.length;
+        picture.dataset.number = pictureInfo.id;
+
+        return picture;
+    };
+
     const removePicturesFromPage = () => {
         const pictureBlocks = document.querySelectorAll(".picture");
 
@@ -60,9 +73,12 @@
             pictureFragment.append(renderedPicture);
         };
         picturesContainer.append(pictureFragment);
+
+        const pictureBlocks = document.querySelectorAll(".picture");
+        pictureBlocks.forEach(element => element.addEventListener("click", onPictureBlockClick));
     };
 
-    function debounce(f, ms) {
+    const debounce = (f, ms) => {
         let isCooldown = false;
 
         return function () {
@@ -73,8 +89,13 @@
         };
     };
 
+    const onPictureBlockClick = (evt) => {
+        window.showBigPicture(popularPhotos[evt.currentTarget.dataset.number])
+    };
+
     const successHandler = (pictureData) => {
         photosInformation = pictureData;
+        console.log('photosInformation: ', photosInformation);
 
         const FILTERS = {
             "filter-popular": () => {
@@ -98,6 +119,8 @@
             FILTERS[evt.currentTarget.id]();
         };
 
+        const onFilterButtonClickDebounced = debounce(onFilterButtonClick, DEBOUNCE_INTERVAL);
+
         fillPopularPhotos();
 
         //show filter buttons after load
@@ -106,16 +129,13 @@
         //show events
         const filterButtons = document.querySelectorAll(".img-filters__button");
 
-        // filterButtons.forEach(button => button.addEventListener("click", onFilterButtonClick));
-        filterButtons.forEach(button => button.addEventListener("click", debounce(onFilterButtonClick, DEBOUNCE_INTERVAL)));
+        // filterButtons.forEach(button => button.addEventListener("click", debounce(onFilterButtonClick, DEBOUNCE_INTERVAL)));
+        filterButtons.forEach(button => button.addEventListener("click", onFilterButtonClickDebounced));
 
         fillNewPhotos();
         fillDiscussedPhotos();
 
         showPhotosOnPage(popularPhotos);
-
-        const pictureBlocks = document.querySelectorAll(".picture");
-        pictureBlocks.forEach(element => element.addEventListener("click", onPictureBlockClick));
     };
 
     const errorHandler = (errorMessage) => {
@@ -133,22 +153,5 @@
     };
 
     window.backend.load(successHandler, errorHandler);
-
-    const pictureTemplate = document.querySelector("#picture").content.querySelector(".picture");
-
-    const renderPicture = (pictureInfo) => {
-        const picture = pictureTemplate.cloneNode(true);
-
-        picture.querySelector(".picture__img").src = pictureInfo.url;
-        picture.querySelector(".picture__likes").textContent = pictureInfo.likes;
-        picture.querySelector(".picture__comments").textContent = pictureInfo.comments.length;
-        picture.dataset.number = pictureInfo.id;
-
-        return picture;
-    };
-
-    const onPictureBlockClick = (evt) => {
-        window.showBigPicture(popularPhotos[evt.currentTarget.dataset.number])
-    };
 
 })();
