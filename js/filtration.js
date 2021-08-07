@@ -148,8 +148,6 @@
 
         errorNode.textContent = errorMessage;
         document.body.insertAdjacentElement('afterbegin', errorNode);
-
-        console.log(errorMessage);
     };
 
     window.backend.load(successHandler, errorHandler);

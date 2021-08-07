@@ -70,6 +70,8 @@
     const socialCommentsCount = bigPictureCard.querySelector(".social__comment-count");
     const socialCommentsLoaderButton = bigPictureCard.querySelector(".comments-loader");
 
+    socialCommentsLoaderButton.classList.remove("visually-hidden");
+
     const comments = pictureData.comments;
 
     let currentCommentsIndex = 0;
@@ -95,13 +97,9 @@
       }
     };
 
-    const onSocialCommentsLoaderButtonClick = () => {
-      showMoreComments();
-    };
-
-    socialCommentsLoaderButton.addEventListener("click", onSocialCommentsLoaderButtonClick);
-
     showMoreComments();
+
+    socialCommentsLoaderButton.addEventListener("click", showMoreComments)
 
     //close events
     document.addEventListener("keydown", onBigPictureEscPress);
