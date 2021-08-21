@@ -78,16 +78,24 @@
         pictureBlocks.forEach(element => element.addEventListener("click", onPictureBlockClick));
     };
 
-    const debounce = (f, ms) => {
-        let isCooldown = false;
+    let lastTimeout = 0;
 
-        return function () {
-            if (isCooldown) return;
-            f.apply(this, arguments);
-            isCooldown = true;
-            setTimeout(() => isCooldown = false, ms);
-        };
-    };
+    const debounce = (f, ms) => {
+        // let isCooldown = false;
+
+        // return function () {
+        //     if (isCooldown) return;
+        //     f.apply(this, arguments);
+        //     isCooldown = true;
+        //     setTimeout(() => isCooldown = false, ms);
+        // };
+
+        if (lastTimeout) {
+            clearTimeout(lastTimeout);
+        }
+        lastTimeout = setTimeout(f, ms);
+
+    }
 
     const onPictureBlockClick = (evt) => {
         window.showBigPicture(popularPhotos[evt.currentTarget.dataset.number])
@@ -119,7 +127,7 @@
             FILTERS[evt.currentTarget.id]();
         };
 
-        const onFilterButtonClickDebounced = debounce(onFilterButtonClick, DEBOUNCE_INTERVAL);
+        // const onFilterButtonClickDebounced = debounce(onFilterButtonClick, DEBOUNCE_INTERVAL);
 
         fillPopularPhotos();
 
@@ -129,8 +137,8 @@
         //show events
         const filterButtons = document.querySelectorAll(".img-filters__button");
 
-        // filterButtons.forEach(button => button.addEventListener("click", debounce(onFilterButtonClick, DEBOUNCE_INTERVAL)));
-        filterButtons.forEach(button => button.addEventListener("click", onFilterButtonClickDebounced));
+        filterButtons.forEach(button => button.addEventListener("click", debounce(onFilterButtonClick, DEBOUNCE_INTERVAL)));
+        // filterButtons.forEach(button => button.addEventListener("click", onFilterButtonClickDebounced));
 
         fillNewPhotos();
         fillDiscussedPhotos();

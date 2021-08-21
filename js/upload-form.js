@@ -105,15 +105,17 @@
     };
 
     const onUploadOverlayEscPress = (evt) => {
-        if (window.utils.isEscKey(evt)) {
-            closeUploadOverlay();
-        }
+        // if (window.utils.isEscKey(evt)) {
+        //     closeUploadOverlay();
+        // }
+        window.utils.isEscKey(evt, closeUploadOverlay)
     };
 
     const onUploadCancelButtonEnterPress = (evt) => {
-        if (window.utils.isEnterKey(evt)) {
-            closeUploadOverlay();
-        }
+        // if (window.utils.isEnterKey(evt)) {
+        //     closeUploadOverlay();
+        // }
+        window.utils.isEnterKey(evt, closeUploadOverlay)
     };
 
     const formPicture = document.querySelector(".img-upload__preview");
@@ -222,9 +224,10 @@
     }
 
     const onUploadSuccessEscPress = (evt) => {
-        if (window.utils.isEscKey(evt)) {
-            closeUploadSuccess();
-        }
+        // if (window.utils.isEscKey(evt)) {
+        //     closeUploadSuccess();
+        // }
+        window.utils.isEscKey(evt, closeUploadSuccess)
     };
 
     const onUploadSuccessButtonClick = () => {
@@ -232,9 +235,10 @@
     };
 
     const onUploadErrorEscPress = (evt) => {
-        if (window.utils.isEscKey(evt)) {
-            closeUploadError();
-        }
+        // if (window.utils.isEscKey(evt)) {
+        //     closeUploadError();
+        // }
+        window.utils.isEscKey(evt, closeUploadError)
     };
 
     const onUploadErrorTryAgainButtonClick = () => {

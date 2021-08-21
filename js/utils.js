@@ -4,12 +4,21 @@
     const ESC_KEY_NAME = "Escape";
     const ENTER_KEY_NAME = "Enter";
 
+    const KEYS = {
+        ESC: "Escape",
+        ENTER: "Enter",
+    }
+
     window.utils = {
-        isEscKey: function (evt) {
-            return evt.key === ESC_KEY_NAME;
+        isEscKey: (evt, action) => {
+            if (evt.key === KEYS.ESC) {
+                action();
+            }
         },
-        isEnterKey: function (evt) {
-            return evt.key === ENTER_KEY_NAME;
+        isEnterKey: (evt, action) => {
+            if (evt.key === KEYS.ENTER) {
+                action();
+            }
         }
     };
 })();

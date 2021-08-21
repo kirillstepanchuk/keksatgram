@@ -3,6 +3,7 @@
 (function () {
   const AVATAR_WIDTH = 35;
   const AVATAR_HEIGHT = 35;
+  const NEW_COMMENTS_INTERVAL = 5;
   const AVATAR_ALTERNATIVE_TEXT = "Аватар автора комментария";
 
   const removeElementsFromList = (list) => {
@@ -53,7 +54,6 @@
   const bigPictureCancelButton = bigPictureCard.querySelector("#picture-cancel");
 
   window.showBigPicture = (pictureData) => {
-    bigPictureCard.classList.remove("hidden");
 
     bigPictureImage.src = pictureData.url;
     bigPictureLikes.textContent = pictureData.likes;
@@ -64,8 +64,6 @@
     const socialCommens = bigPictureCard.querySelector(".social__comments");
 
     removeElementsFromList(socialCommens);
-
-    const NEW_COMMENTS_INTERVAL = 5;
 
     const socialCommentsCount = bigPictureCard.querySelector(".social__comment-count");
     const socialCommentsLoaderButton = bigPictureCard.querySelector(".comments-loader");
@@ -83,6 +81,8 @@
       for (let i = currentCommentsIndex; i < maxCommentsIndex; i++) {
         commentFragment.appendChild(createComment(comments[i]));
       };
+
+      // comments.forEach(comment => commentFragment.appendChild(createComment(comment)););
 
       socialCommens.append(commentFragment);
 
@@ -106,12 +106,15 @@
 
     bigPictureCancelButton.addEventListener("click", onBigPictureCancelButtonClick);
     bigPictureCancelButton.addEventListener("keydown", onBigPictureCancelButtonEnterPress);
+
+    bigPictureCard.classList.remove("hidden");
   };
 
   const onBigPictureEscPress = (evt) => {
-    if (window.utils.isEscKey(evt)) {
-      closeBigPicture();
-    }
+    // if (window.utils.isEscKey(evt)) {
+    //   closeBigPicture();
+    // }
+    window.utils.isEscKey(evt, closeBigPicture)
   };
 
   const onBigPictureCancelButtonClick = () => {
@@ -119,9 +122,10 @@
   };
 
   const onBigPictureCancelButtonEnterPress = (evt) => {
-    if (window.utils.isEnterKey(evt)) {
-      closeBigPicture();
-    }
+    // if (window.utils.isEnterKey(evt)) {
+    //   closeBigPicture();
+    // }
+    window.utils.isEnterKey(evt, closeBigPicture)
   };
 
   const closeBigPicture = () => {
@@ -130,6 +134,7 @@
 
     bigPictureCancelButton.removeEventListener("click", onBigPictureCancelButtonClick);
     bigPictureCancelButton.removeEventListener("keydown", onBigPictureCancelButtonEnterPress);
+    // socialCommentsLoaderButton.removeEventListener("click", showMoreComments);
   };
 
 })();
