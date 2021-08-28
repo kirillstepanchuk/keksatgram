@@ -105,16 +105,10 @@
     };
 
     const onUploadOverlayEscPress = (evt) => {
-        // if (window.utils.isEscKey(evt)) {
-        //     closeUploadOverlay();
-        // }
         window.utils.isEscKey(evt, closeUploadOverlay)
     };
 
     const onUploadCancelButtonEnterPress = (evt) => {
-        // if (window.utils.isEnterKey(evt)) {
-        //     closeUploadOverlay();
-        // }
         window.utils.isEnterKey(evt, closeUploadOverlay)
     };
 
@@ -204,10 +198,6 @@
 
     effectLevelPin.addEventListener("mousedown", onEffectLevelPinMouseDown);
 
-    //upload form
-    uploadPictureInput.addEventListener("change", onUploadInputChange);
-
-
     const closeUploadSuccess = () => {
         document.removeEventListener("keydown", onUploadSuccessEscPress);
         document.querySelector(".success__button").removeEventListener("click", onUploadSuccessButtonClick);
@@ -224,9 +214,6 @@
     }
 
     const onUploadSuccessEscPress = (evt) => {
-        // if (window.utils.isEscKey(evt)) {
-        //     closeUploadSuccess();
-        // }
         window.utils.isEscKey(evt, closeUploadSuccess)
     };
 
@@ -235,9 +222,6 @@
     };
 
     const onUploadErrorEscPress = (evt) => {
-        // if (window.utils.isEscKey(evt)) {
-        //     closeUploadError();
-        // }
         window.utils.isEscKey(evt, closeUploadError)
     };
 
@@ -378,4 +362,10 @@
     };
 
     uploadFormSubmitButton.addEventListener("click", onuploadFormSubmitButtonClick);
+
+    const openUploadForm = () => {
+        uploadPictureInput.addEventListener("change", onUploadInputChange);
+    }
+
+    window.uploadForm = openUploadForm;
 })();
