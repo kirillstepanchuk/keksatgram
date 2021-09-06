@@ -81,7 +81,6 @@
       maxCommentsIndex = getMaxCommentIndex(currentCommentsIndex, comments.length);
 
       bigPictureCommentsCount.textContent = comments.length;
-      // socialCommentsCount.textContent = `${currentCommentsIndex} из ${bigPictureCommentsCount} комментариев`;
       socialCommentsCount.firstChild.textContent = `${currentCommentsIndex} из `;
 
       // comments-count

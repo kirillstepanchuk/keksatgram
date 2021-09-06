@@ -1,9 +1,13 @@
 "use strict";
 
 (function () {
+
     let popularPhotos = [];
     let newPhotos = [];
     let discussedPhotos = [];
+
+    const NEW_PHOTOS_COUNT = 10;
+    const SPLICE_LENGTH = 1;
 
     const FILTERS = {
         "filter-popular": () => {
@@ -40,20 +44,32 @@
         }
 
         const fillNewPhotos = () => {
+            // let newPhotos = [];
+            // let temp = true;
+
+            // while (temp) {
+            //     let randomPhoto = window.utils.getRandomUnitFromList(photos);
+
+            //     if (newPhotos.indexOf(randomPhoto) === -1) {
+            //         newPhotos.push(randomPhoto);
+            //     };
+
+            //     if (newPhotos.length === 10) {
+            //         temp = false
+            //     };
+            // };
+
+            // return newPhotos;
+
+            const photosCopy = photos.slice();
+
             let newPhotos = [];
-            let temp = true;
 
-            while (temp) {
-                let randomPhoto = window.utils.getRandomUnitFromList(photos);
-
-                if (newPhotos.indexOf(randomPhoto) === -1) {
-                    newPhotos.push(randomPhoto);
-                };
-
-                if (newPhotos.length === 10) {
-                    temp = false
-                };
-            };
+            while (newPhotos.length < NEW_PHOTOS_COUNT) {
+                let randomElement = window.utils.getRandomUnitFromList(photosCopy);
+                let photo = photosCopy.splice(randomElement.id, SPLICE_LENGTH);
+                newPhotos = newPhotos.concat(photo);
+            }
 
             return newPhotos;
         }

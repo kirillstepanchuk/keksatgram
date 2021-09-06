@@ -3,9 +3,7 @@
 (function () {
 
     const successHandler = (pictureData) => {
-        let photosInformation = pictureData;
-
-        window.filtering(photosInformation);
+        window.filtering(pictureData);
         window.uploadForm();
         window.gallery.bigPicture();
     };
