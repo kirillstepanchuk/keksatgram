@@ -4,6 +4,9 @@
     const MAX_EFFECT_VALUE = 100;
     const MAX_HASHTAGS_COUNT = 5;
     const MAX_HASHTAG_LENGTH = 20;
+    const MAX_SCALE_PERCENTAGE = 100;
+    const MIN_SCALE_PERCENTAGE = 25;
+    const SCALE_COEFFICIENT = 100;
 
     const Effect = {
         none: {
@@ -51,6 +54,29 @@
     };
 
     let currentEffect = "none";
+    let currentScalePercentage = 0;
+    let scaleValue = 1;
+
+    const uploadPictureInput = document.querySelector("#upload-file");
+    const uploadForm = document.querySelector(".img-upload__form");
+    const uploadOverlay = uploadForm.querySelector(".img-upload__overlay");
+    const uploadCancelButton = uploadOverlay.querySelector("#upload-cancel");
+    const effectItems = uploadOverlay.querySelectorAll(".effects__item");
+    const uploadHashtagsInput = uploadOverlay.querySelector(".text__hashtags");
+    const uploadDescriptionInput = uploadOverlay.querySelector(".text__description");
+    const formPicture = uploadOverlay.querySelector(".img-upload__preview");
+    const effectLevelBlock = uploadOverlay.querySelector(".img-upload__effect-level");
+    const effectLevelLine = effectLevelBlock.querySelector(".effect-level__line");
+    const effectLevelPin = effectLevelBlock.querySelector(".effect-level__pin");
+    const effectLevelDepth = effectLevelBlock.querySelector(".effect-level__depth");
+    const effectLevelValue = effectLevelBlock.querySelector(".effect-level__value");
+    const uploadFormSubmitButton = uploadOverlay.querySelector(".img-upload__submit");
+    const imageScaleSmallerButton = uploadOverlay.querySelector('.scale__control--smaller');
+    const imageScaleBiggerButton = uploadOverlay.querySelector('.scale__control--bigger');
+    const imageScalePercentage = uploadOverlay.querySelector('.scale__control--value');
+
+    const errorTemplate = document.querySelector("#error").content.querySelector(".error");
+    const successTemplate = document.querySelector("#success").content.querySelector(".success");
 
     //calculate and return effect level for every effect
     const getEffectLevel = () => {
@@ -62,10 +88,6 @@
         return (Effect[currentEffect].maxValue - Effect[currentEffect].minValue) * deptEffectLevelPercent / MAX_EFFECT_VALUE + Effect[currentEffect].minValue;
     };
 
-    const uploadCancelButton = document.querySelector("#upload-cancel");
-    const uploadOverlay = document.querySelector(".img-upload__overlay");
-    const effectItems = document.querySelectorAll(".effects__item");
-
     const showUploadOverlay = () => {
         effectLevelBlock.classList.add("hidden");
 
@@ -75,6 +97,10 @@
 
         uploadOverlay.classList.remove("hidden");
 
+        imageScalePercentage.value = `${MAX_SCALE_PERCENTAGE}%`;
+        currentScalePercentage = parseInt(imageScalePercentage.value);
+        formPicture.style.transform = `scale(${scaleValue})`;
+
         uploadCancelButton.addEventListener("click", onUploadCancelButtonClick);
         uploadCancelButton.addEventListener("keydown", onUploadCancelButtonEnterPress);
         document.addEventListener("keydown", onUploadOverlayEscPress);
@@ -82,16 +108,15 @@
         effectItems.forEach(element => element.addEventListener("click", onEffectButtonClick));
     };
 
-    const uploadPictureInput = document.querySelector("#upload-file");
-    const uploadHashtagsInput = document.querySelector(".text__hashtags");
-    const uploadDescriptionInput = document.querySelector(".text__description");
-
     const closeUploadOverlay = () => {
         uploadPictureInput.value = "";
         uploadHashtagsInput.value = "";
         uploadDescriptionInput.value = "";
 
         uploadOverlay.classList.add("hidden");
+
+        currentScalePercentage = MAX_SCALE_PERCENTAGE;
+        resetScale();
 
         uploadCancelButton.removeEventListener("click", onUploadCancelButtonClick);
         uploadCancelButton.removeEventListener("keydown", onUploadCancelButtonEnterPress);
@@ -107,20 +132,20 @@
     };
 
     const onUploadOverlayEscPress = (evt) => {
-        window.utils.isEscKey(evt, closeUploadOverlay)
+        window.utils.isEscKey(evt, () => {
+            if (uploadHashtagsInput === document.activeElement || uploadDescriptionInput === document.activeElement) {
+                return;
+            } else {
+                closeUploadOverlay();
+            };
+        });
     };
 
     const onUploadCancelButtonEnterPress = (evt) => {
         window.utils.isEnterKey(evt, closeUploadOverlay)
     };
 
-    const formPicture = document.querySelector(".img-upload__preview");
-    const effectLevelBlock = document.querySelector(".img-upload__effect-level");
-    const effectLevelLine = document.querySelector(".effect-level__line");
-    const effectLevelPin = effectLevelBlock.querySelector(".effect-level__pin");
-    const effectLevelDepth = effectLevelBlock.querySelector(".effect-level__depth");
-    const effectLevelValue = effectLevelBlock.querySelector(".effect-level__value");
-
+    //Effects
     const addEffectLevel = () => {
         formPicture.style.filter = Effect[currentEffect].filterName + "(" + getEffectLevel(currentEffect) + Effect[currentEffect].unit + ")";
     };
@@ -240,10 +265,34 @@
         uploadPictureInput.click();
     };
 
-    const uploadForm = document.querySelector(".img-upload__form");
-    const errorTemplate = document.querySelector("#error").content.querySelector(".error");
-    const successTemplate = document.querySelector("#success").content.querySelector(".success");
+    //Image scale edit
 
+    const SCALE_RESIZE_PERCENTAGE = 25;
+
+    const resetScale = () => {
+        imageScalePercentage.value = `${currentScalePercentage}%`;
+        scaleValue = currentScalePercentage / SCALE_COEFFICIENT;
+        formPicture.style.transform = `scale(${scaleValue})`
+    }
+
+    const onScaleBiggerButtonClick = () => {
+        if (currentScalePercentage < MAX_SCALE_PERCENTAGE) {
+            currentScalePercentage = currentScalePercentage + SCALE_RESIZE_PERCENTAGE;
+            resetScale();
+        };
+    };
+
+    const onScaleSmallerButtonClick = () => {
+        if (currentScalePercentage > MIN_SCALE_PERCENTAGE) {
+            currentScalePercentage = currentScalePercentage - SCALE_RESIZE_PERCENTAGE;
+            resetScale();
+        };
+    };
+
+    imageScaleBiggerButton.addEventListener('click', onScaleBiggerButtonClick);
+    imageScaleSmallerButton.addEventListener('click', onScaleSmallerButtonClick);
+
+    //handlers
     const successHandler = () => {
         closeUploadOverlay();
 
@@ -352,8 +401,6 @@
         }
         return errorMessage;
     };
-
-    const uploadFormSubmitButton = uploadOverlay.querySelector(".img-upload__submit");
 
     const onUploadFormSubmitButtonClick = () => {
         checkHashtagsValidity();

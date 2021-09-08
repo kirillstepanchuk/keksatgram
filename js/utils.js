@@ -11,6 +11,7 @@
     let lastTimeout = null;
 
     const isEscKey = (evt, action) => {
+        evt.preventDefault();
         if (evt.key === Key.ESC) {
             action();
         };

@@ -17,19 +17,15 @@
   };
 
   const showBigPicture = (pictureData) => {
-    // render picture
     renderBigPicture(pictureData);
 
-    //comments
     window.renderComments(pictureData);
 
-    //close events
     document.addEventListener("keydown", onBigPictureEscPress);
 
     bigPictureCancelButton.addEventListener("click", onBigPictureCancelButtonClick);
     bigPictureCancelButton.addEventListener("keydown", onBigPictureCancelButtonEnterPress);
 
-    //show big picture
     bigPictureCard.classList.remove("hidden");
   };
 
