@@ -2,22 +2,34 @@
 
 (function () {
 
+    const errorTemplate = document.querySelector('#error').content.querySelector('.error');
+
+    const onErrorHandlerTryAgainButtonClick = () => {
+        document.location.reload();
+    }
+
+    const setErrorButtonEventListener = () => {
+        const errorButtons = document.querySelectorAll('.error__button');
+
+        errorButtons[0].addEventListener('click', onErrorHandlerTryAgainButtonClick);
+        errorButtons[1].classList.add('hidden');
+    }
+
+    //handlers
     const successHandler = (pictureData) => {
-        window.filtering(pictureData);
+        window.allPhotos = pictureData;
+
+        window.gallery();
         window.uploadForm();
-        window.gallery.bigPicture();
+        window.bigPicture();
     };
 
     const errorHandler = (errorMessage) => {
-        let errorNode = document.createElement('div');
-        errorNode.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red';
-        errorNode.style.position = 'absolute';
-        errorNode.style.left = 0;
-        errorNode.style.right = 0;
-        errorNode.style.fontSize = '20px';
+        const errorNode = errorTemplate.cloneNode(true);
+        errorNode.querySelector('.error__title').textContent = errorMessage;
+        document.querySelector('main').insertAdjacentElement('afterbegin', errorNode);
 
-        errorNode.textContent = errorMessage;
-        document.body.insertAdjacentElement('afterbegin', errorNode);
+        setErrorButtonEventListener()
     };
 
     window.backend.load(successHandler, errorHandler);

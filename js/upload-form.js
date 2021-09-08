@@ -2,8 +2,10 @@
 
 (function () {
     const MAX_EFFECT_VALUE = 100;
+    const MAX_HASHTAGS_COUNT = 5;
+    const MAX_HASHTAG_LENGTH = 20;
 
-    const EFFECTS = {
+    const Effect = {
         none: {
             name: "none",
             filterName: "none",
@@ -57,7 +59,7 @@
 
         const deptEffectLevelPercent = MAX_EFFECT_VALUE * deptEffectLevelValue / maxEffectLevelValue;
 
-        return (EFFECTS[currentEffect].maxValue - EFFECTS[currentEffect].minValue) * deptEffectLevelPercent / MAX_EFFECT_VALUE + EFFECTS[currentEffect].minValue;
+        return (Effect[currentEffect].maxValue - Effect[currentEffect].minValue) * deptEffectLevelPercent / MAX_EFFECT_VALUE + Effect[currentEffect].minValue;
     };
 
     const uploadCancelButton = document.querySelector("#upload-cancel");
@@ -95,7 +97,7 @@
         uploadCancelButton.removeEventListener("keydown", onUploadCancelButtonEnterPress);
         document.removeEventListener("keydown", onUploadOverlayEscPress);
         effectLevelPin.removeEventListener("mouseup", onEffectLevelPinMouseup);
-        uploadFormSubmitButton.removeEventListener("click", onuploadFormSubmitButtonClick);
+        uploadFormSubmitButton.removeEventListener("click", onUploadFormSubmitButtonClick);
 
         effectItems.forEach(element => element.removeEventListener("click", onEffectButtonClick));
     };
@@ -120,7 +122,7 @@
     const effectLevelValue = effectLevelBlock.querySelector(".effect-level__value");
 
     const addEffectLevel = () => {
-        formPicture.style.filter = EFFECTS[currentEffect].filterName + "(" + getEffectLevel(currentEffect) + EFFECTS[currentEffect].unit + ")";
+        formPicture.style.filter = Effect[currentEffect].filterName + "(" + getEffectLevel(currentEffect) + Effect[currentEffect].unit + ")";
     };
 
     const onEffectLevelPinMouseup = () => {
@@ -273,9 +275,6 @@
     })
 
     //hashtags
-    const MAX_HASHTAGS_COUNT = 5;
-    const MAX_HASHTAG_LENGTH = 20;
-
     const getCountSimilarElementsInList = (numsArr, target) => {
         let count = 0;
 
@@ -290,8 +289,8 @@
         tagContainsOnlySharp: "Хештег состоит только из решетки. ",
         similarTags: "Имеются одинаковые хештеги. ",
         noSpacesBetweenTags: "Хештеги должны разделяться пробелами. ",
-        moreThan20Letters: "Хештег более 20 символов. ",
-        moreThan5Tags: "Указано больше 5 хештегов. ",
+        moreThanMaxLetters: `Хештег более ${MAX_HASHTAG_LENGTH} символов. `,
+        moreThanMaxTags: `Указано больше ${MAX_HASHTAGS_COUNT} хештегов. `,
         hashtagDoesNotStartWithSharp: "Хештеги должны начинаться с #. ",
     };
 
@@ -313,7 +312,7 @@
         return hashTag.split("#").length - 1 > 1;
     };
 
-    const isMoreThan20Letters = (hashTag) => {
+    const isMoreThanMaxLetters = (hashTag) => {
         return hashTag.length > MAX_HASHTAG_LENGTH;
     };
 
@@ -321,7 +320,7 @@
         return getCountSimilarElementsInList(hashTagList, hashTag) > 1;
     };
 
-    const isMoreThan5Tags = (hashTagList) => {
+    const isMoreThanMaxTags = (hashTagList) => {
         return hashTagList.length > MAX_HASHTAGS_COUNT;
     };
 
@@ -332,13 +331,13 @@
 
         const hashTags = uploadHashtagsInput.value.split(" ");
 
-        errorsState.moreThan5Tags = errorsState.moreThan5Tags || isMoreThan5Tags(hashTags);
+        errorsState.moreThanMaxTags = errorsState.moreThanMaxTags || isMoreThanMaxTags(hashTags);
 
         for (let i = 0; i < hashTags.length; i++) {
             errorsState.hashtagDoesNotStartWithSharp = errorsState.hashtagDoesNotStartWithSharp || isHashtagStartWithSharp(hashTags[i], uploadHashtagsInput);
             errorsState.tagContainsOnlySharp = errorsState.tagContainsOnlySharp || isTagContainsOnlySharp(hashTags[i]);
             errorsState.noSpacesBetweenTags = errorsState.noSpacesBetweenTags || isSpacesBetweenTags(hashTags[i]);
-            errorsState.moreThan20Letters = errorsState.moreThan20Letters || isMoreThan20Letters(hashTags[i]);
+            errorsState.moreThanMaxLetters = errorsState.moreThanMaxLetters || isMoreThanMaxLetters(hashTags[i]);
             errorsState.similarTags = errorsState.similarTags || isSimilarTags(hashTags, hashTags[i]);
         };
     };
@@ -356,16 +355,16 @@
 
     const uploadFormSubmitButton = uploadOverlay.querySelector(".img-upload__submit");
 
-    const onuploadFormSubmitButtonClick = () => {
+    const onUploadFormSubmitButtonClick = () => {
         checkHashtagsValidity();
         uploadHashtagsInput.setCustomValidity(createErrorMessage());
     };
 
-    uploadFormSubmitButton.addEventListener("click", onuploadFormSubmitButtonClick);
+    uploadFormSubmitButton.addEventListener("click", onUploadFormSubmitButtonClick);
 
-    const openUploadForm = () => {
+    const initUploadFormListener = () => {
         uploadPictureInput.addEventListener("change", onUploadInputChange);
     }
 
-    window.uploadForm = openUploadForm;
+    window.uploadForm = initUploadFormListener;
 })();

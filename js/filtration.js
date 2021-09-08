@@ -1,105 +1,60 @@
 "use strict";
 
 (function () {
-
-    let popularPhotos = [];
-    let newPhotos = [];
-    let discussedPhotos = [];
-
     const NEW_PHOTOS_COUNT = 10;
     const SPLICE_LENGTH = 1;
 
-    const FILTERS = {
-        "filter-popular": () => {
-            showFilteredPhotos(popularPhotos);
-        },
-        "filter-new": () => {
-            showFilteredPhotos(newPhotos);
-        },
-        "filter-discussed": () => {
-            showFilteredPhotos(discussedPhotos);
-        },
-    };
+    const popularPhotosFilter = document.querySelector('#filter-popular');
+    const newPhotosFilter = document.querySelector('#filter-new');
+    const discussedPhotosFilter = document.querySelector('#filter-discussed');
 
-    window.showFilteredPhotos = (photoList) => {
-        window.utils.removePicturesFromPage();
-
-        const picturesContainer = document.querySelector(".pictures");
-        const pictureFragment = document.createDocumentFragment();
-
-        photoList.forEach(photo => pictureFragment.append(window.gallery.renderPicture(photo)))
-
-        picturesContainer.append(pictureFragment);
-
-        window.gallery.bigPicture();
-    };
-
-    const filtering = (photos) => {
-        const fillPopularPhotos = () => {
-            let popularPhotos = [];
-
-            photos.forEach(photo => popularPhotos.push(photo));
-
-            return popularPhotos;
-        }
-
-        const fillNewPhotos = () => {
-            // let newPhotos = [];
-            // let temp = true;
-
-            // while (temp) {
-            //     let randomPhoto = window.utils.getRandomUnitFromList(photos);
-
-            //     if (newPhotos.indexOf(randomPhoto) === -1) {
-            //         newPhotos.push(randomPhoto);
-            //     };
-
-            //     if (newPhotos.length === 10) {
-            //         temp = false
-            //     };
-            // };
-
-            // return newPhotos;
-
-            const photosCopy = photos.slice();
-
-            let newPhotos = [];
-
-            while (newPhotos.length < NEW_PHOTOS_COUNT) {
-                let randomElement = window.utils.getRandomUnitFromList(photosCopy);
-                let photo = photosCopy.splice(randomElement.id, SPLICE_LENGTH);
-                newPhotos = newPhotos.concat(photo);
-            }
-
-            return newPhotos;
-        }
-
-        const fillDiscussedPhotos = () => {
-            let discussedPhotos = photos.slice().sort((a, b) => b.comments.length - a.comments.length);
-
-            return discussedPhotos;
-        }
-
-        window.allPhotos = photos;
-
-        popularPhotos = fillPopularPhotos();
-        newPhotos = fillNewPhotos();
-        discussedPhotos = fillDiscussedPhotos();
-
-        const filterButtons = document.querySelectorAll(".img-filters__button");
-
-        const onFilterButtonClick = (evt) => {
-            window.utils.clearActiveFilterButton();
-            window.utils.debounce(FILTERS[evt.currentTarget.id]);
-            evt.currentTarget.classList.add("img-filters__button--active");
-        };
-
-        filterButtons.forEach(button => button.addEventListener("click", onFilterButtonClick));
-
-        document.querySelector(".img-filters").classList.remove("img-filters--inactive");
-
-        showFilteredPhotos(popularPhotos)
+    const FilterId = {
+        POPULAR: popularPhotosFilter.id,
+        NEW: newPhotosFilter.id,
+        DISCUSSED: discussedPhotosFilter.id,
     }
 
-    window.filtering = filtering;
+    const fillPopularPhotos = () => {
+        let popularPhotos = [];
+
+        window.allPhotos.forEach(photo => popularPhotos.push(photo));
+
+        return popularPhotos;
+    };
+
+    const fillNewPhotos = () => {
+        const photosCopy = window.allPhotos.slice();
+
+        let newPhotos = [];
+
+        while (newPhotos.length < NEW_PHOTOS_COUNT) {
+            let randomElement = window.utils.getRandomUnitFromList(photosCopy);
+            let photo = photosCopy.splice(randomElement.id, SPLICE_LENGTH);
+            newPhotos = newPhotos.concat(photo);
+        };
+
+        return newPhotos;
+    };
+
+    const fillDiscussedPhotos = () => {
+        let discussedPhotos = window.allPhotos.slice().sort((a, b) => b.comments.length - a.comments.length);
+
+        return discussedPhotos;
+    };
+
+    document.querySelector(".img-filters").classList.remove("img-filters--inactive");
+
+    window.filtratePhotos = (filterId) => {
+        switch (filterId) {
+            case FilterId.POPULAR:
+                return fillPopularPhotos();
+
+            case FilterId.NEW:
+                return fillNewPhotos();
+
+            case FilterId.DISCUSSED:
+                return fillDiscussedPhotos();
+        };
+    };
+
 })();
