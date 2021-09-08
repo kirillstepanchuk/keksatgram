@@ -135,9 +135,8 @@
         window.utils.isEscKey(evt, () => {
             if (uploadHashtagsInput === document.activeElement || uploadDescriptionInput === document.activeElement) {
                 return;
-            } else {
-                closeUploadOverlay();
-            };
+            }
+            closeUploadOverlay();
         });
     };
 
