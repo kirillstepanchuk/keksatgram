@@ -7,6 +7,7 @@
     const MAX_SCALE_PERCENTAGE = 100;
     const MIN_SCALE_PERCENTAGE = 25;
     const SCALE_COEFFICIENT = 100;
+    const SCALE_RESIZE_PERCENTAGE = 25;
 
     const Effect = {
         none: {
@@ -174,6 +175,10 @@
 
     const onEffectButtonClick = (evt) => {
         currentEffect = evt.currentTarget.querySelector("input").value;
+
+        currentScalePercentage = MAX_SCALE_PERCENTAGE;
+        resetScale();
+
         showEffect();
     };
 
@@ -265,9 +270,6 @@
     };
 
     //Image scale edit
-
-    const SCALE_RESIZE_PERCENTAGE = 25;
-
     const resetScale = () => {
         imageScalePercentage.value = `${currentScalePercentage}%`;
         scaleValue = currentScalePercentage / SCALE_COEFFICIENT;
@@ -317,22 +319,14 @@
         errorTemplate.querySelectorAll(".error__button")[1].addEventListener("click", onUploadErrorUploadNewFileButtonClick);
     };
 
-    uploadForm.addEventListener("submit", (evt) => {
+    const onUploadFormSubmit = (evt) => {
         evt.preventDefault();
         window.backend.upload(new FormData(uploadForm), successHandler, errorHandler);
-    })
+    }
+
+    uploadForm.addEventListener("submit", onUploadFormSubmit);
 
     //hashtags
-    const getCountSimilarElementsInList = (numsArr, target) => {
-        let count = 0;
-
-        for (let i = 0; i < numsArr.length; i++) {
-            if (numsArr[i] == target) count++
-        };
-
-        return count;
-    };
-
     const ErrorNameToErrorDescription = {
         tagContainsOnlySharp: "Хештег состоит только из решетки. ",
         similarTags: "Имеются одинаковые хештеги. ",
@@ -346,6 +340,16 @@
 
     for (let key in errorsState) {
         errorsState[key] = false;
+    };
+
+    const getCountSimilarElementsInList = (numsArr, target) => {
+        let count = 0;
+
+        for (let i = 0; i < numsArr.length; i++) {
+            if (numsArr[i] == target) count++
+        };
+
+        return count;
     };
 
     const isHashtagStartWithSharp = (hashTag, input) => {
@@ -394,7 +398,7 @@
         let errorMessage = "";
 
         for (let key in errorsState) {
-            if (errorsState[key] === true) {
+            if (errorsState[key]) {
                 errorMessage = errorMessage + ErrorNameToErrorDescription[key];
             }
         }

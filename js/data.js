@@ -19,9 +19,10 @@
     const successHandler = (pictureData) => {
         window.allPhotos = pictureData;
 
-        window.gallery();
+        window.filtration();
         window.uploadForm();
-        window.bigPicture();
+
+        window.initGalleryListeners();
     };
 
     const errorHandler = (errorMessage) => {

@@ -49,14 +49,6 @@
     bigPictureCancelButton.removeEventListener("keydown", onBigPictureCancelButtonEnterPress);
   };
 
-  const onPictureBlockClick = (evt) => {
-    showBigPicture(window.allPhotos[evt.currentTarget.dataset.number])
-  };
-
-  const initBigPictureListener = () => {
-    document.querySelectorAll(".picture").forEach(element => element.addEventListener("click", onPictureBlockClick));
-  };
-
-  window.bigPicture = initBigPictureListener;
+  window.showBigPicture = showBigPicture;
 
 })();
