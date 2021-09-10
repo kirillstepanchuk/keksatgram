@@ -30,7 +30,7 @@
         errorNode.querySelector('.error__title').textContent = errorMessage;
         document.querySelector('main').insertAdjacentElement('afterbegin', errorNode);
 
-        setErrorButtonEventListener()
+        setErrorButtonEventListener();
     };
 
     window.backend.load(successHandler, errorHandler);

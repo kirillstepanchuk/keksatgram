@@ -2,7 +2,7 @@
 
 (function () {
     const onPictureBlockClick = (evt) => {
-        window.showBigPicture(window.allPhotos[evt.currentTarget.dataset.number])
+        window.showBigPicture(window.allPhotos[evt.currentTarget.dataset.number]);
     };
 
     const initGalleryListeners = () => {

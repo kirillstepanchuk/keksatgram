@@ -242,10 +242,10 @@
         errorTemplate.querySelectorAll(".error__button")[1].removeEventListener("click", onUploadErrorUploadNewFileButtonClick);
 
         document.querySelector(".error").remove();
-    }
+    };
 
     const onUploadSuccessEscPress = (evt) => {
-        window.utils.isEscKey(evt, closeUploadSuccess)
+        window.utils.isEscKey(evt, closeUploadSuccess);
     };
 
     const onUploadSuccessButtonClick = () => {
@@ -322,7 +322,7 @@
     const onUploadFormSubmit = (evt) => {
         evt.preventDefault();
         window.backend.upload(new FormData(uploadForm), successHandler, errorHandler);
-    }
+    };
 
     uploadForm.addEventListener("submit", onUploadFormSubmit);
 
@@ -400,8 +400,9 @@
         for (let key in errorsState) {
             if (errorsState[key]) {
                 errorMessage = errorMessage + ErrorNameToErrorDescription[key];
-            }
-        }
+            };
+        };
+
         return errorMessage;
     };
 
@@ -414,7 +415,7 @@
 
     const initUploadFormListener = () => {
         uploadPictureInput.addEventListener("change", onUploadInputChange);
-    }
+    };
 
     window.uploadForm = initUploadFormListener;
 })();
