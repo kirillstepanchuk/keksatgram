@@ -16,12 +16,6 @@
         filterButtons.forEach(filterButton => filterButton.classList.remove('img-filters__button--active'));
     };
 
-    const removePicturesFromPage = () => {
-        const pictureBlocks = document.querySelectorAll(".picture");
-
-        pictureBlocks.forEach(picture => picture.remove());
-    };
-
     const fillPopularPhotos = () => {
         const popularPhotos = window.allPhotos.slice();
 
@@ -64,33 +58,22 @@
     };
 
     const initFiltration = () => {
-        let currentPhotos = window.allPhotos;
-
-        const showFilteredPhotos = () => {
-            removePicturesFromPage();
-
-            const picturesContainer = document.querySelector(".pictures");
-            const pictureFragment = document.createDocumentFragment();
-
-            currentPhotos.forEach(photo => pictureFragment.append(window.renderPicture(photo)));
-
-            picturesContainer.append(pictureFragment);
-
-            window.initGalleryListeners();
-        };
+        window.currentPhotos = fillPopularPhotos();
 
         const onFilterButtonClick = (evt) => {
             currentPhotos = filtratePhotos(evt.currentTarget.id);
 
             clearActiveFilterButton();
-            window.utils.debounce(showFilteredPhotos);
+
+            window.utils.debounce(() => {
+                window.showPhotos(currentPhotos);
+            });
+
             evt.currentTarget.classList.add("img-filters__button--active");
         };
 
-        showFilteredPhotos();
         filterButtons.forEach(button => button.addEventListener("click", onFilterButtonClick));
     };
 
     window.filtration = initFiltration;
-
 })();

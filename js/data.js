@@ -22,7 +22,7 @@
         window.filtration();
         window.uploadForm();
 
-        window.initGalleryListeners();
+        window.showPhotos(window.currentPhotos);
     };
 
     const errorHandler = (errorMessage) => {
@@ -34,5 +34,4 @@
     };
 
     window.backend.load(successHandler, errorHandler);
-
 })();
